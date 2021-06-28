@@ -11,9 +11,12 @@ import java.awt.Insets;
 import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
 import java.util.LinkedHashSet;
+import java.io.InputStream;
+import java.io.FileInputStream;
 
 public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 	BufferedImage img;
+	InputStream stream;
 	String path="/home/dev/Downloads/drk_beaver.jpg";
 	LinkedHashSet<Integer>keysPressed;
 	double zoom;
@@ -54,10 +57,14 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 		try{
 			if(img!=null){
 				img.getGraphics().dispose();
+				stream.close();
 				img=null;
 			}
-			img=ImageIO.read(new File(path));
+			stream=new FileInputStream(path);
+			img=ImageIO.read(stream);
 			final float width=img.getWidth(),height=img.getHeight();
+			//img.getGraphics().dispose();
+			//stream.close();
 			final float ac=width/height;
 			System.out.println("ar: "+ac);
 			final int tb=getTitleBarHeight();
@@ -69,9 +76,12 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 			int new_height2=Math.min((int)height,getHeight()-tb);
 			new_height2=(int)(new_width2*(1/ac));
 			new_width2=(int)(new_height2*ac);
-			final int new_width=Math.min(new_width1,new_width2);
-			final int new_height=Math.min(new_height1,new_height2);
+			int new_width=Math.min(new_width1,new_width2);
+			int new_height=Math.min(new_height1,new_height2);
 			final Image image=img.getScaledInstance(new_width,new_height,Image.SCALE_SMOOTH);
+			img.getGraphics().dispose();
+			stream.close();
+			img.flush();
 			img=new BufferedImage(new_width,new_height,BufferedImage.TYPE_4BYTE_ABGR);
 			img.getGraphics().drawImage(image,0,0,this);
 			System.out.println("new size : "+new_width+","+new_height);
@@ -82,14 +92,20 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 		repaint();
 	}
 
-	public void loadImageMaintainAspectRatioAndZoomIn(final String path){
+	public void loadImageMaintainAspectRatioAndZoom(final String path){
 		try{
 			if(img!=null){
 				img.getGraphics().dispose();
+				stream.close();
+				img.flush();
 				img=null;
 			}
-			img=ImageIO.read(new File(path));
+			stream=new FileInputStream(path);
+			img=ImageIO.read(stream);
 			final float width=img.getWidth(),height=img.getHeight();
+			//img.getGraphics().dispose();
+			//stream.close();
+			//img.flush();
 			final float ac=width/height;
 			System.out.println("ar: "+ac);
 			final int tb=getTitleBarHeight();
@@ -104,9 +120,12 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 			int new_width=Math.min(new_width1,new_width2);
 			int new_height=Math.min(new_height1,new_height2);
 			new_width=(int)(zoom*new_width);
-			new_height*=(int)(zoom*new_height);
-			img=new BufferedImage(new_width,new_height,BufferedImage.TYPE_4BYTE_ABGR);
+			new_height=(int)(zoom*new_height);
 			final Image image=img.getScaledInstance(new_width,new_height,Image.SCALE_SMOOTH);
+			img.getGraphics().dispose();
+			stream.close();
+			img.flush();
+			img=new BufferedImage(new_width,new_height,BufferedImage.TYPE_4BYTE_ABGR);
 			img.getGraphics().drawImage(image,0,0,this);
 			//image.getGraphics().dispose();
 			System.out.println("new size : "+new_width+","+new_height);
@@ -119,7 +138,12 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 	public void zoomIn(){
 		System.out.println("zoomIn");
 		zoom=zoom*incr;
-		loadImageMaintainAspectRatioAndZoomIn(path);
+		loadImageMaintainAspectRatioAndZoom(path);
+	}
+	public void zoomOut(){
+		System.out.println("zoomOut");
+		zoom=zoom/incr;
+		loadImageMaintainAspectRatioAndZoom(path);
 	}
 	@Override
 	public void paint(Graphics g){
@@ -154,6 +178,14 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 				zoomIn();
 			}
 		}
+		if(KEY==KeyEvent.VK_SUBTRACT){
+			System.out.println("Minus");
+			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+				System.out.println("found");
+				zoomOut();
+			}
+		}
+			
 	}
 	@Override
 	public void keyTyped(KeyEvent event){}
