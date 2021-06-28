@@ -16,6 +16,8 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 	BufferedImage img;
 	String path="/home/dev/Downloads/drk_beaver.jpg";
 	LinkedHashSet<Integer>keysPressed;
+	double zoom;
+	double incr=1.2;
 	public MainFrame(){
 		this.setTitle("EOS");
 		this.setSize(500,500);
@@ -23,6 +25,7 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 		this.addComponentListener(this);
 		this.addKeyListener(this);
 		//loadImage(path);
+		zoom=1;
 		loadImageMaintainAspectRatio(path);
 		keysPressed=new LinkedHashSet<>();
 		this.setVisible(true);
@@ -49,6 +52,10 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 	}
 	public void loadImageMaintainAspectRatio(final String path){
 		try{
+			if(img!=null){
+				img.getGraphics().dispose();
+				img=null;
+			}
 			img=ImageIO.read(new File(path));
 			final float width=img.getWidth(),height=img.getHeight();
 			final float ac=width/height;
@@ -74,8 +81,45 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 		}
 		repaint();
 	}
+
+	public void loadImageMaintainAspectRatioAndZoomIn(final String path){
+		try{
+			if(img!=null){
+				img.getGraphics().dispose();
+				img=null;
+			}
+			img=ImageIO.read(new File(path));
+			final float width=img.getWidth(),height=img.getHeight();
+			final float ac=width/height;
+			System.out.println("ar: "+ac);
+			final int tb=getTitleBarHeight();
+			int new_width1=Math.min((int)width,getWidth());
+			int new_height1=Math.min((int)height,getHeight()-tb);
+			new_width1=(int)(new_height1*ac);
+			new_height1=(int)(new_width1*(1/ac));
+			int new_width2=Math.min((int)width,getWidth());
+			int new_height2=Math.min((int)height,getHeight()-tb);
+			new_height2=(int)(new_width2*(1/ac));
+			new_width2=(int)(new_height2*ac);
+			int new_width=Math.min(new_width1,new_width2);
+			int new_height=Math.min(new_height1,new_height2);
+			new_width=(int)(zoom*new_width);
+			new_height*=(int)(zoom*new_height);
+			img=new BufferedImage(new_width,new_height,BufferedImage.TYPE_4BYTE_ABGR);
+			final Image image=img.getScaledInstance(new_width,new_height,Image.SCALE_SMOOTH);
+			img.getGraphics().drawImage(image,0,0,this);
+			//image.getGraphics().dispose();
+			System.out.println("new size : "+new_width+","+new_height);
+			//image.dispose();TODO
+		}catch(final IOException ioException){
+			ioException.printStackTrace();
+		}
+		repaint();
+	}
 	public void zoomIn(){
 		System.out.println("zoomIn");
+		zoom=zoom*incr;
+		loadImageMaintainAspectRatioAndZoomIn(path);
 	}
 	@Override
 	public void paint(Graphics g){
