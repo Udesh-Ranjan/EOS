@@ -13,15 +13,18 @@ import java.awt.event.KeyEvent;
 import java.util.LinkedHashSet;
 import java.io.InputStream;
 import java.io.FileInputStream;
-
+import java.io.File;
 public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 	BufferedImage img;
 	InputStream stream;
-	String path="/home/dev/Downloads/drk_beaver.jpg";
+	//String path="/home/dev/Downloads/drk_beaver.jpg";
+	String path;
 	LinkedHashSet<Integer>keysPressed;
 	double zoom;
 	double incr=1.2;
-	public MainFrame(){
+	boolean fileNoFound=false;
+	public MainFrame(final String path){
+		this.path=path;
 		this.setTitle("EOS");
 		this.setSize(500,500);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -29,12 +32,19 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 		this.addKeyListener(this);
 		//loadImage(path);
 		zoom=1;
-		loadImageMaintainAspectRatio(path);
+		if(pictureExists(path))
+			loadImageMaintainAspectRatio(path);
+		else System.out.println(path+" not found");
 		keysPressed=new LinkedHashSet<>();
 		this.setVisible(true);
 		System.out.println("Control : "+KeyEvent.VK_CONTROL);
 		System.out.println("Add : "+KeyEvent.VK_ADD);
 		//System.out.println("Title Bar height : "+getInsets().top);
+	}
+	public static boolean pictureExists(final String path){
+		File file=new File(path);
+		return file.exists() && file.isFile();
+
 	}
 	public int getTitleBarHeight(){
 		final Insets insets=getInsets();
@@ -101,8 +111,8 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 				img=null;
 			}
 			stream=new FileInputStream(path);
-			img=ImageIO.read(stream);
-			final float width=img.getWidth(),height=img.getHeight();
+			final BufferedImage _img=ImageIO.read(stream);
+			final float width=_img.getWidth(),height=_img.getHeight();
 			//img.getGraphics().dispose();
 			//stream.close();
 			//img.flush();
@@ -121,10 +131,17 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 			int new_height=Math.min(new_height1,new_height2);
 			new_width=(int)(zoom*new_width);
 			new_height=(int)(zoom*new_height);
-			final Image image=img.getScaledInstance(new_width,new_height,Image.SCALE_SMOOTH);
-			img.getGraphics().dispose();
+			if(new_width <=0 || new_height<=0){
+				System.out.println("Cannot zoomOut image is too small");
+				_img.getGraphics().dispose();
+				stream.close();
+				_img.flush();
+				return;
+			}
+			final Image image=_img.getScaledInstance(new_width,new_height,Image.SCALE_SMOOTH);
+			_img.getGraphics().dispose();
 			stream.close();
-			img.flush();
+			_img.flush();
 			img=new BufferedImage(new_width,new_height,BufferedImage.TYPE_4BYTE_ABGR);
 			img.getGraphics().drawImage(image,0,0,this);
 			//image.getGraphics().dispose();
@@ -139,11 +156,18 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 		System.out.println("zoomIn");
 		zoom=zoom*incr;
 		loadImageMaintainAspectRatioAndZoom(path);
+		if(pictureExists(path))
+			loadImageMaintainAspectRatioAndZoom(path);
+		else System.out.println(path+" not found");
+
 	}
 	public void zoomOut(){
 		System.out.println("zoomOut");
 		zoom=zoom/incr;
-		loadImageMaintainAspectRatioAndZoom(path);
+		//loadImageMaintainAspectRatioAndZoom(path);
+		if(pictureExists(path))
+			loadImageMaintainAspectRatioAndZoom(path);
+		else System.out.println(path+" not found");
 	}
 	@Override
 	public void paint(Graphics g){
@@ -161,7 +185,10 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 	public void componentResized(ComponentEvent event){
 		System.out.println("size : "+getWidth()+","+getHeight());
 		//loadImage(path);
-		loadImageMaintainAspectRatio(path);
+		if(pictureExists(path))
+			loadImageMaintainAspectRatio(path);
+		else System.out.println(path+" not found");
+
 	}
 	@Override
 	public void componentMoved(ComponentEvent event){}
@@ -185,7 +212,7 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 				zoomOut();
 			}
 		}
-			
+
 	}
 	@Override
 	public void keyTyped(KeyEvent event){}
