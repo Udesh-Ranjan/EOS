@@ -14,6 +14,10 @@ import java.util.LinkedHashSet;
 import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.File;
+import java.awt.geom.AffineTransform;
+import java.awt.Graphics2D;
+import java.awt.Color;
+
 public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 	BufferedImage img;
 	InputStream stream;
@@ -21,8 +25,11 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 	String path;
 	LinkedHashSet<Integer>keysPressed;
 	double zoom;
-	double incr=1.2;
+	final double incr=1.2;
 	boolean fileNoFound=false;
+	double rotation;
+	int move=5;//pixels
+	int hor,ver;
 	public MainFrame(final String path){
 		this.path=path;
 		this.setTitle("EOS");
@@ -32,6 +39,8 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 		this.addKeyListener(this);
 		//loadImage(path);
 		zoom=1;
+		rotation=0;
+		hor=ver=0;
 		if(pictureExists(path))
 			loadImageMaintainAspectRatio(path);
 		else System.out.println(path+" not found");
@@ -152,12 +161,90 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 		}
 		repaint();
 	}
+	public void loadImageMaintainAspectRatioZoomAndRotate(final String path){
+		try{
+			if(img!=null){
+				img.getGraphics().dispose();
+				stream.close();
+				img.flush();
+				img=null;
+			}
+			stream=new FileInputStream(path);
+			final BufferedImage _img=ImageIO.read(stream);
+			final float width=_img.getWidth(),height=_img.getHeight();
+			//img.getGraphics().dispose();
+			//stream.close();
+			//img.flush();
+			final float ac=width/height;
+			System.out.println("ar: "+ac);
+			final int tb=getTitleBarHeight();
+			int new_width1=Math.min((int)width,getWidth());
+			int new_height1=Math.min((int)height,getHeight()-tb);
+			new_width1=(int)(new_height1*ac);
+			new_height1=(int)(new_width1*(1/ac));
+			int new_width2=Math.min((int)width,getWidth());
+			int new_height2=Math.min((int)height,getHeight()-tb);
+			new_height2=(int)(new_width2*(1/ac));
+			new_width2=(int)(new_height2*ac);
+			int new_width=Math.min(new_width1,new_width2);
+			int new_height=Math.min(new_height1,new_height2);
+			new_width=(int)(zoom*new_width);
+			new_height=(int)(zoom*new_height);
+			if(new_width <=0 || new_height<=0){
+				System.out.println("Cannot zoomOut image is too small");
+				_img.getGraphics().dispose();
+				stream.close();
+				_img.flush();
+				return;
+			}
+			final Image image=_img.getScaledInstance(new_width,new_height,Image.SCALE_SMOOTH);
+			_img.getGraphics().dispose();
+			stream.close();
+			_img.flush();
+			final BufferedImage scaledImg=new BufferedImage(new_width,new_height,BufferedImage.TYPE_4BYTE_ABGR);
+			scaledImg.getGraphics().drawImage(image,0,0,this);
+			img=rotateImageByDegrees(scaledImg,rotation);
+			scaledImg.getGraphics().dispose();
+			scaledImg.flush();
+			//image.getGraphics().dispose();
+			System.out.println("new size : "+new_width+","+new_height);
+			//image.dispose();TODO
+		}catch(final IOException ioException){
+			ioException.printStackTrace();
+		}
+		repaint();
+	}
+	public BufferedImage rotateImageByDegrees(final BufferedImage img,final double angle) {
+		final double rads = Math.toRadians(angle);
+		final double sin = Math.abs(Math.sin(rads)), cos = Math.abs(Math.cos(rads));
+		final int w = img.getWidth();
+		final int h = img.getHeight();
+		final int newWidth = (int) Math.floor(w * cos + h * sin);
+		final int newHeight = (int) Math.floor(h * cos + w * sin);
+
+		final BufferedImage rotated = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+		final Graphics2D g2d = rotated.createGraphics();
+		final AffineTransform at = new AffineTransform();
+		at.translate((newWidth - w) / 2, (newHeight - h) / 2);
+
+		final int x = w / 2;
+		final int y = h / 2;
+
+		at.rotate(rads, x, y);
+		g2d.setTransform(at);
+		g2d.drawImage(img, 0, 0, this);
+		//g2d.setColor(Color.RED);
+		//g2d.drawRect(0, 0, newWidth - 1, newHeight - 1);
+		g2d.dispose();
+
+		return rotated;
+	}
 	public void zoomIn(){
 		System.out.println("zoomIn");
 		zoom=zoom*incr;
 		loadImageMaintainAspectRatioAndZoom(path);
 		if(pictureExists(path))
-			loadImageMaintainAspectRatioAndZoom(path);
+			loadImageMaintainAspectRatioZoomAndRotate(path);
 		else System.out.println(path+" not found");
 
 	}
@@ -166,15 +253,29 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 		zoom=zoom/incr;
 		//loadImageMaintainAspectRatioAndZoom(path);
 		if(pictureExists(path))
-			loadImageMaintainAspectRatioAndZoom(path);
+			loadImageMaintainAspectRatioZoomAndRotate(path);
 		else System.out.println(path+" not found");
 	}
+	public void rotate(final double angle){
+		System.out.println("rotate");
+		rotation+=angle;
+		if(pictureExists(path))
+			loadImageMaintainAspectRatioZoomAndRotate(path);
+		else System.out.println(path+" not found");
+	}
+	public void moveImage(final int HORIZONTAL,final int VERTICAL){
+		hor+=HORIZONTAL;
+		ver+=VERTICAL;
+		repaint();
+	}
+
 	@Override
 	public void paint(Graphics g){
 		if(img!=null){
 			g.clearRect(0,0,getWidth(),getHeight());
 			final int tb=getTitleBarHeight();
-			g.drawImage(img,getWidth()/2-img.getWidth()/2,getHeight()/2-(img.getHeight()-tb)/2,img.getWidth(),img.getHeight(),this);
+			g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-(img.getHeight()-tb)/2+ver,
+					img.getWidth(),img.getHeight(),this);
 		}
 	}
 	@Override
@@ -184,6 +285,7 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 	@Override
 	public void componentResized(ComponentEvent event){
 		System.out.println("size : "+getWidth()+","+getHeight());
+		hor=ver=0;
 		//loadImage(path);
 		if(pictureExists(path))
 			loadImageMaintainAspectRatio(path);
@@ -198,11 +300,13 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 		final int KEY=event.getKeyCode();
 		keysPressed.add(KEY);
 		System.out.println(keysPressed);
+		boolean exe=false;
 		if(KEY==KeyEvent.VK_ADD){
 			System.out.println("Add");
 			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
 				System.out.println("found");
 				zoomIn();
+				exe=true;
 			}
 		}
 		if(KEY==KeyEvent.VK_SUBTRACT){
@@ -210,9 +314,48 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
 				System.out.println("found");
 				zoomOut();
+				exe=true;
 			}
 		}
+		if(KEY==KeyEvent.VK_LEFT){
+			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+				System.out.println("rotate left");
+				rotate(-10);
+				exe=true;
 
+			}
+		}
+		if(KEY==KeyEvent.VK_RIGHT){
+			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+				System.out.println("rotate right");
+				rotate(10);
+				exe=true;
+			}
+		}
+		if(KEY==KeyEvent.VK_UP){
+			if(!exe){
+				moveImage(0,-move);
+				exe=true;
+			}
+		}
+		if(KEY==KeyEvent.VK_DOWN){
+			if(!exe){
+				moveImage(0,move);
+				exe=true;
+			}
+		}
+		if(KEY==KeyEvent.VK_LEFT){
+			if(!exe){
+				moveImage(-move,0);
+				exe=true;
+			}
+		}
+		if(KEY==KeyEvent.VK_RIGHT){
+			if(!exe){
+				moveImage(move,0);
+				exe=true;
+			}
+		}
 	}
 	@Override
 	public void keyTyped(KeyEvent event){}
