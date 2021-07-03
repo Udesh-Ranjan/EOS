@@ -17,6 +17,7 @@ import java.io.File;
 import java.awt.geom.AffineTransform;
 import java.awt.Graphics2D;
 import java.awt.Color;
+import java.awt.image.RescaleOp;
 
 public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 	BufferedImage img;
@@ -25,11 +26,13 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 	String path;
 	LinkedHashSet<Integer>keysPressed;
 	double zoom;
-	final double incr=1.2;
+	final static double incr=1.2;
+	final static int move=5;//pixels
+	final static float brightness_change=0.1f;
 	boolean fileNoFound=false;
 	double rotation;
-	int move=5;//pixels
 	int hor,ver;
+	float brightness;
 	public MainFrame(final String path){
 		this.path=path;
 		this.setTitle("EOS");
@@ -41,6 +44,7 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 		zoom=1;
 		rotation=0;
 		hor=ver=0;
+		brightness=1.0f;
 		if(pictureExists(path))
 			loadImageMaintainAspectRatio(path);
 		else System.out.println(path+" not found");
@@ -204,6 +208,7 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 			final BufferedImage scaledImg=new BufferedImage(new_width,new_height,BufferedImage.TYPE_4BYTE_ABGR);
 			scaledImg.getGraphics().drawImage(image,0,0,this);
 			img=rotateImageByDegrees(scaledImg,rotation);
+			changeBrightness();
 			scaledImg.getGraphics().dispose();
 			scaledImg.flush();
 			//image.getGraphics().dispose();
@@ -356,7 +361,30 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 				exe=true;
 			}
 		}
+		if(KEY==KeyEvent.VK_B)
+			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+				brightness+=(brightness_change*(keysPressed.contains(KeyEvent.VK_SHIFT)?-1:1));	
+				loadImageMaintainAspectRatioZoomAndRotate(path);
+				//changeBrightness(brightness_change*(keysPressed.contains(KeyEvent.VK_SHIFT)?-1:1));
+				exe=true;
+			}
+		/*if(KEY==KeyEvent.VK_B)
+		  if(keysPressed.contains(KeyEvent.VK_CONTROL) && keysPressed.contains(KeyEvent.VK_SHIFT)){
+		  changeBrightness(-brightness_change);
+		  exe=true;
+		  }
+		  */
 	}
+	public void changeBrightness(){
+		if(pictureExists(path)){
+			final BufferedImage prev=img;
+			final RescaleOp op=new RescaleOp(brightness,0,null);
+			img=op.filter(img,null);
+			repaint();
+		}
+		else System.out.println(path+" not found");
+	}	
+
 	@Override
 	public void keyTyped(KeyEvent event){}
 	@Override
