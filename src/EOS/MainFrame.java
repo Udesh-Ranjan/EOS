@@ -157,6 +157,7 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 			_img.flush();
 			img=new BufferedImage(new_width,new_height,BufferedImage.TYPE_4BYTE_ABGR);
 			img.getGraphics().drawImage(image,0,0,this);
+			changeBrightness();
 			//image.getGraphics().dispose();
 			System.out.println("new size : "+new_width+","+new_height);
 			//image.dispose();TODO
@@ -380,7 +381,6 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 			final BufferedImage prev=img;
 			final RescaleOp op=new RescaleOp(brightness,0,null);
 			img=op.filter(img,null);
-			repaint();
 		}
 		else System.out.println(path+" not found");
 	}	
