@@ -18,6 +18,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.image.RescaleOp;
+import java.awt.Rectangle;
+import java.awt.Stroke;
+import java.awt.BasicStroke;
 
 public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 	BufferedImage img;
@@ -33,6 +36,8 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 	double rotation;
 	int hor,ver;
 	float brightness;
+	public boolean cropMode;
+	public Rectangle rectangle;
 	public MainFrame(final String path){
 		this.path=path;
 		this.setTitle("EOS");
@@ -45,6 +50,7 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 		rotation=0;
 		hor=ver=0;
 		brightness=1.0f;
+		rectangle=new Rectangle(0,0,0,0);
 		if(pictureExists(path))
 			loadImageMaintainAspectRatio(path);
 		else System.out.println(path+" not found");
@@ -281,7 +287,18 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 			g.clearRect(0,0,getWidth(),getHeight());
 			final int tb=getTitleBarHeight();
 			g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-(img.getHeight()-tb)/2+ver,
-					img.getWidth(),img.getHeight(),this);
+					Math.min(img.getWidth(),getWidth()),Math.min(img.getHeight(),getHeight()),this);
+			if(cropMode){
+			//	Graphics2D _g=(Graphics2D)img.getGraphics();
+				Graphics _g=g;
+				Color c=_g.getColor();
+				_g.setColor(Color.cyan);
+				//Stroke stroke=_g.getStroke();
+				//_g.setStroke(new BasicStroke(20));	
+				_g.drawRect(rectangle.x,rectangle.y,rectangle.width,rectangle.height);
+				_g.setColor(c);
+				//_g.setStroke(stroke);
+			}
 		}
 	}
 	@Override
@@ -292,6 +309,8 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 	public void componentResized(ComponentEvent event){
 		System.out.println("size : "+getWidth()+","+getHeight());
 		hor=ver=0;
+		rotation=0;
+		cropMode=false;
 		//loadImage(path);
 		if(pictureExists(path))
 			loadImageMaintainAspectRatio(path);
@@ -307,6 +326,52 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 		keysPressed.add(KEY);
 		System.out.println(keysPressed);
 		boolean exe=false;
+		if(cropMode){
+			if(KEY==KeyEvent.VK_ENTER){
+				//TODO
+				//save the select region to new bufferedimage
+			}
+			if(KEY==KeyEvent.VK_LEFT){
+				if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+					rectangle.width--;
+				}else{
+					rectangle.x--;
+					rectangle.width++;
+				}
+				exe=true;
+			}
+			if(KEY==KeyEvent.VK_RIGHT){
+				if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+					rectangle.width++;
+				}else{
+					rectangle.x++;
+					rectangle.width--;
+				}
+				exe=true;
+			}
+			if(KEY==KeyEvent.VK_UP){
+				if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+					rectangle.height--;
+				}else{
+					rectangle.y--;
+					rectangle.height++;
+				}
+				exe=true;
+			}
+			if(KEY==KeyEvent.VK_DOWN){
+				if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+					rectangle.height++;
+				}else{
+					rectangle.y++;
+					rectangle.height--;
+				}
+				exe=true;
+			}
+			if(exe){
+				repaint();
+				return;
+			}
+		}
 		if(KEY==KeyEvent.VK_ADD){
 			System.out.println("Add");
 			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
@@ -369,6 +434,21 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 				//changeBrightness(brightness_change*(keysPressed.contains(KeyEvent.VK_SHIFT)?-1:1));
 				exe=true;
 			}
+		if(KEY==KeyEvent.VK_C)
+			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+				cropMode=true;
+				final int width=50,height=50;
+				rectangle.width=width;
+				rectangle.height=height;
+				rectangle.x=getWidth()/2-width/2;
+				rectangle.y=getHeight()/2-height/2;
+			}
+		if(KEY==KeyEvent.VK_ESCAPE){
+			if(cropMode){
+				cropMode=false;
+				repaint();
+			}
+		}
 		/*if(KEY==KeyEvent.VK_B)
 		  if(keysPressed.contains(KeyEvent.VK_CONTROL) && keysPressed.contains(KeyEvent.VK_SHIFT)){
 		  changeBrightness(-brightness_change);
