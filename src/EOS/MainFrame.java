@@ -67,8 +67,8 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 	}
 	public int getTitleBarHeight(){
 		final Insets insets=getInsets();
-		if(insets!=null)
-			return insets.top;
+		//if(insets!=null)
+		//	return insets.top;
 		return 0;
 	}
 	public void loadImage(final String path){
@@ -83,6 +83,7 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 		repaint();
 	}
 	public void loadImageMaintainAspectRatio(final String path){
+		synchronized(this){
 		try{
 			if(img!=null){
 				img.getGraphics().dispose();
@@ -119,6 +120,7 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 			ioException.printStackTrace();
 		}
 		repaint();
+		}
 	}
 
 	public void loadImageMaintainAspectRatioAndZoom(final String path){
@@ -172,7 +174,11 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 		}
 		repaint();
 	}
+	/**
+	 * TODO fix the rotation bug
+	 */
 	public void loadImageMaintainAspectRatioZoomAndRotate(final String path){
+		synchronized(this){
 		try{
 			if(img!=null){
 				img.getGraphics().dispose();
@@ -188,7 +194,8 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 			//img.flush();
 			final float ac=width/height;
 			System.out.println("ar: "+ac);
-			final int tb=getTitleBarHeight();
+			int tb=getTitleBarHeight();
+			tb=0;
 			int new_width1=Math.min((int)width,getWidth());
 			int new_height1=Math.min((int)height,getHeight()-tb);
 			new_width1=(int)(new_height1*ac);
@@ -225,6 +232,7 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 			ioException.printStackTrace();
 		}
 		repaint();
+		}
 	}
 	public BufferedImage rotateImageByDegrees(final BufferedImage img,final double angle) {
 		final double rads = Math.toRadians(angle);
@@ -270,6 +278,7 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 	}
 	public void rotate(final double angle){
 		System.out.println("rotate");
+		hor=ver=0;
 		rotation+=angle;
 		if(pictureExists(path))
 			loadImageMaintainAspectRatioZoomAndRotate(path);
@@ -286,9 +295,17 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 		if(img!=null){
 			g.clearRect(0,0,getWidth(),getHeight());
 			final int tb=getTitleBarHeight();
-			g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-(img.getHeight()-tb)/2+ver,
+			/*g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-(img.getHeight()-tb)/2+ver,
 					Math.min(img.getWidth(),getWidth()),Math.min(img.getHeight(),getHeight()),this);
-			if(cropMode){
+			*/
+			hor=0;
+			ver=0;
+			/*g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-img.getHeight()/2+ver,
+					Math.min(img.getWidth(),getWidth()),Math.min(img.getHeight(),getHeight()),null);
+					*/
+			g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-img.getHeight()/2+ver,
+					img.getWidth(),img.getHeight(),null);
+			if(cropMode && false){
 			//	Graphics2D _g=(Graphics2D)img.getGraphics();
 				Graphics _g=g;
 				Color c=_g.getColor();
