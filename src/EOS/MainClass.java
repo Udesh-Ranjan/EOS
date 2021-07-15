@@ -6,7 +6,7 @@ public class MainClass{
 			path.append(str);
 		System.out.println("path : "+path);
 		MainFrame frame=new MainFrame(path.toString());
-		Thread thread=new Thread(()->{
+		/*Thread thread=new Thread(()->{
 			while(true){
 				frame.rotate(10);
 				try{
@@ -18,5 +18,6 @@ public class MainClass{
 		});
 		thread.start();
 		thread.join();
+		*/
 	}
 }
