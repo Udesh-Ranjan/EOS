@@ -25,59 +25,47 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import java.awt.Dimension;
+import javax.swing.JPanel;
 
-public class MainFrame extends JFrame implements KeyListener,ComponentListener{
-	//BufferedImage img;
-	//InputStream stream;
+public class EOSPanel extends JPanel /*implements ComponentListener,KeyListener*/{
+	BufferedImage img;
+	InputStream stream;
 	//String path="/home/dev/Downloads/drk_beaver.jpg";
 	String path;
 	LinkedHashSet<Integer>keysPressed;
-	//double zoom;
-	//final static double incr=1.2;
-	//final static int move=5;//pixels
-	//final static float brightness_change=0.1f;
-	//boolean fileNoFound=false;
-	//double rotation;
-	//int hor,ver;
-	//float brightness;
-	//public boolean cropMode;
-	//public Rectangle rectangle;
+	double zoom;
+	final static double incr=1.2;
+	final static int move=5;//pixels
+	final static float brightness_change=0.1f;
+	boolean fileNoFound=false;
+	double rotation;
+	int hor,ver;
+	float brightness;
+	public boolean cropMode;
+	public Rectangle rectangle;
 	
-	private JMenuBar menuBar;
-	private JMenu fileMenu;
-	private JMenuItem newMenuItem,openMenuItem,saveMenuItem,saveAsMenuItem,exitMenuItem;
-	private JMenu editMenu;
-	private JMenuItem brightnessMenuItem,increaseBrightnessMenuItem,decreaseBrightnessMenuItem;
-	private JMenuItem rotateMenuItem,rotateLeftMenuItem,rotateRightMenuItem;
-	private JMenuItem shiftMenuItem,shiftLeftMenuItem,shiftRightMenuItem,shiftUpMenuItem,shiftDownMenuItem;
-	private JMenuItem zoomMenuItem,zoomInMenuItem,zoomOutMenuItem;
-
-	private JMenu toolsMenu;
-	private JMenuItem cameraMenuItem;
-	private EOSPanel eosPanel;
+	private final MainFrame mainFrame;
 	//private JMenu settings;
 	//TODO move stuffs to JPanel's child class
-	public MainFrame(final String path){
+	public EOSPanel(final String path,final Dimension size,final MainFrame mainFrame){
 		this.path=path;
-		this.setTitle("EOS");
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		keysPressed=new LinkedHashSet<>();
-		this.setSize(500,500);
-		initializeMenuBar();
+		this.mainFrame=mainFrame;
+		//this.setTitle("EOS");
+		//this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//this.addComponentListener(this);
+		//this.addKeyListener(this);
+		this.setSize(size.getSize());
 		//this.setLayout(null);
 		//loadImage(path);
-		//zoom=1;
-		//rotation=0;
-		//hor=ver=0;
-		//brightness=1.0f;
-		//rectangle=new Rectangle(0,0,0,0);
-		this.addComponentListener(this);
-		this.addKeyListener(this);
-		if(pictureExists(path)){
-			eosPanel=new EOSPanel(path,getSize(),this);
-			add(eosPanel);
-		}
-		else System.out.println(path+" Picture not found in the path");
+		zoom=1;
+		rotation=0;
+		hor=ver=0;
+		brightness=1.0f;
+		rectangle=new Rectangle(0,0,0,0);
+		if(pictureExists(path))
+			loadImage(path);
+		else System.out.println(path+"Picture not found");
+		keysPressed=new LinkedHashSet<>();
 		//initializeMenuBar();
 		//pack();
 		this.setVisible(true);
@@ -85,43 +73,15 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 		System.out.println("Add : "+KeyEvent.VK_ADD);
 		//System.out.println("Title Bar height : "+getInsets().top);
 	}
-	private void initializeMenuBar(){
-		menuBar=new JMenuBar();
-		initializeFileMenu();
-		this.setJMenuBar(menuBar);
-		//menuBar.setVisible(true);
-		//menuBar.revalidate();
-	}
-	private void initializeFileMenu(){
-		fileMenu=new JMenu();
-		newMenuItem=new JMenuItem("New");
-		openMenuItem=new JMenuItem("Open");
-		saveMenuItem=new JMenuItem("Save");
-		saveAsMenuItem=new JMenuItem("SaveAs");
-		exitMenuItem=new JMenuItem("Exit");
-		fileMenu.add(newMenuItem);
-		fileMenu.add(openMenuItem);
-		fileMenu.add(saveMenuItem);
-		fileMenu.add(saveAsMenuItem);
-		fileMenu.add(exitMenuItem);
-		//fileMenu.setPreferredSize(new Dimension(100,50));
-		menuBar.add(fileMenu);
-	}
-	private void initializeEditMenu(){
-	}
-	private void initializeToolsMenu(){
-	}
-	private void initializeSettingsMenu(){
-	}
 	public static boolean pictureExists(final String path){
 		File file=new File(path);
 		return file.exists() && file.isFile();
 
 	}
 	public int getTitleBarHeight(){
-		final Insets insets=getInsets();
-		if(insets!=null)
-			return insets.top;
+		//final Insets insets=getInsets();
+		//if(insets!=null)
+		//	return insets.top;
 		return 0;
 	}
 	/*public void loadImage(final String path){
@@ -229,7 +189,7 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 	repaint();
 	}
 	*/
-	/*public void loadImage(final String path){
+	public void loadImage(final String path){
 		synchronized(this){
 			try{
 				if(img!=null){
@@ -285,8 +245,7 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 			repaint();
 		}
 	}
-	*/
-	/*public BufferedImage rotateImageByDegrees(final BufferedImage img,final double angle) {
+	public BufferedImage rotateImageByDegrees(final BufferedImage img,final double angle) {
 		final double rads = Math.toRadians(angle);
 		final double sin = Math.abs(Math.sin(rads)), cos = Math.abs(Math.cos(rads));
 		final int w = img.getWidth();
@@ -311,8 +270,6 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 
 		return rotated;
 	}
-	*/
-	/*
 	public void zoomIn(){
 		System.out.println("zoomIn");
 		zoom=zoom*incr;
@@ -322,8 +279,6 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 		else System.out.println(path+" not found");
 
 	}
-	*/
-	/*
 	public void zoomOut(){
 		System.out.println("zoomOut");
 		zoom=zoom/incr;
@@ -332,8 +287,6 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 			loadImage(path);
 		else System.out.println(path+" not found");
 	}
-	*/
-	/*
 	public void rotate(final double angle){
 		System.out.println("rotate");
 		hor=ver=0;
@@ -342,16 +295,13 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 			loadImage(path);
 		else System.out.println(path+" not found");
 	}
-	*/
-	/*
 	public void moveImage(final int HORIZONTAL,final int VERTICAL){
 		hor+=HORIZONTAL;
 		ver+=VERTICAL;
 		repaint();
 	}
-	*/
-
-	/*@Override
+	/*
+	@Override
 	public void paint(Graphics g){
 		//super.paint(g);
 		if(img!=null){
@@ -360,10 +310,8 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 			System.out.println("title bar height : "+tb);
 			//g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-(img.getHeight()-tb)/2+ver,
 			//  Math.min(img.getWidth(),getWidth()),Math.min(img.getHeight(),getHeight()),this);
-			//
 			//g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-img.getHeight()/2+ver,
 			//  Math.min(img.getWidth(),getWidth()),Math.min(img.getHeight(),getHeight()),null);
-			  
 			//g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2+tb/2-img.getHeight()/2+ver,
 			//		img.getWidth(),img.getHeight(),null);
 			super.paint(g);
@@ -382,13 +330,13 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 		//revalidate();
 	}
 	*/
-	@Override
+	//@Override
 	public void componentHidden(ComponentEvent event){}
-	@Override
+	//@Override
 	public void componentShown(ComponentEvent event){}
-	@Override
+	//@Override
 	public void componentResized(ComponentEvent event){
-		/*System.out.println("size : "+getWidth()+","+getHeight());
+		System.out.println("size : "+getWidth()+","+getHeight());
 		hor=ver=0;
 		rotation=0;
 		cropMode=false;
@@ -396,19 +344,13 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 		if(pictureExists(path))
 			loadImage(path);
 		else System.out.println(path+" not found");
-		*/
-		if(eosPanel!=null){
-			eosPanel.componentResized(event);
-		}
+
 	}
-	@Override
+	//@Override
 	public void componentMoved(ComponentEvent event){}
-	@Override
+	//@Override
 	public void keyPressed(KeyEvent event){
-		if(eosPanel!=null){
-			eosPanel.keyPressed(event);
-		}
-		/*System.out.println("Pressed : "+event.getKeyCode());
+		System.out.println("Pressed : "+event.getKeyCode());
 		final int KEY=event.getKeyCode();
 		keysPressed.add(KEY);
 		System.out.println(keysPressed);
@@ -536,15 +478,13 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 				repaint();
 			}
 		}
-		//if(KEY==KeyEvent.VK_B)
-		//  if(keysPressed.contains(KeyEvent.VK_CONTROL) && keysPressed.contains(KeyEvent.VK_SHIFT)){
-		//  changeBrightness(-brightness_change);
-		//  exe=true;
-		//  }
-		  
-		*/
+		/*if(KEY==KeyEvent.VK_B)
+		  if(keysPressed.contains(KeyEvent.VK_CONTROL) && keysPressed.contains(KeyEvent.VK_SHIFT)){
+		  changeBrightness(-brightness_change);
+		  exe=true;
+		  }
+		  */
 	}
-	/*
 	public void changeBrightness(){
 		if(pictureExists(path)){
 			final BufferedImage prev=img;
@@ -553,20 +493,47 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 		}
 		else System.out.println(path+" not found");
 	}	
-	*/
 
-	@Override
+	//@Override
 	public void keyTyped(KeyEvent event){}
-	@Override
+	//@Override
 	public void keyReleased(KeyEvent event){
-		if(eosPanel!=null){
-			eosPanel.keyReleased(event);
-		}
-		/*System.out.println("Released : "+event.getKeyCode());
+		System.out.println("Released : "+event.getKeyCode());
 		final int KEY=event.getKeyCode();
 		keysPressed.remove(KEY);
 		System.out.println(keysPressed);
-		*/
 
+	}
+	@Override
+	public void paintComponent(Graphics g){
+		System.out.println("paintComponent");
+		super.paintComponent(g);
+		//super.paint(g);
+		if(img!=null){
+			g.clearRect(0,0,getWidth(),getHeight());
+			final int tb=getTitleBarHeight();
+			System.out.println("title bar height : "+tb);
+			/*g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-(img.getHeight()-tb)/2+ver,
+			  Math.min(img.getWidth(),getWidth()),Math.min(img.getHeight(),getHeight()),this);
+			  */
+			/*g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-img.getHeight()/2+ver,
+			  Math.min(img.getWidth(),getWidth()),Math.min(img.getHeight(),getHeight()),null);
+			  */
+			g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2+tb/2-img.getHeight()/2+ver,
+					img.getWidth(),img.getHeight(),null);
+			//TODO implement cropMode
+			if(cropMode && false){
+				//	Graphics2D _g=(Graphics2D)img.getGraphics();
+				Graphics _g=g;
+				Color c=_g.getColor();
+				_g.setColor(Color.cyan);
+				//Stroke stroke=_g.getStroke();
+				//_g.setStroke(new BasicStroke(20));	
+				_g.drawRect(rectangle.x,rectangle.y,rectangle.width,rectangle.height);
+				_g.setColor(c);
+				//_g.setStroke(stroke);
+			}
+		}
+		//revalidate();
 	}
 }
