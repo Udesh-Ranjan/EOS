@@ -80,6 +80,7 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 		else System.out.println(path+" Picture not found in the path");
 		//initializeMenuBar();
 		//pack();
+		//setUndecorated(!false);
 		this.setVisible(true);
 		System.out.println("Control : "+KeyEvent.VK_CONTROL);
 		System.out.println("Add : "+KeyEvent.VK_ADD);
@@ -93,7 +94,7 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 		//menuBar.revalidate();
 	}
 	private void initializeFileMenu(){
-		fileMenu=new JMenu();
+		fileMenu=new JMenu("File");
 		newMenuItem=new JMenuItem("New");
 		openMenuItem=new JMenuItem("Open");
 		saveMenuItem=new JMenuItem("Save");
