@@ -5,19 +5,21 @@ public class MainClass{
 		for(final String str:$)
 			path.append(str);
 		System.out.println("path : "+path);
-		MainFrame frame=new MainFrame(path.toString());
-		/*Thread thread=new Thread(()->{
-			while(true){
-				frame.rotate(10);
-				try{
-					Thread.sleep(100);
-				}catch(Exception exception){
-					exception.printStackTrace();
-				}
-			}
+		javax.swing.SwingUtilities.invokeLater(()->{
+			MainFrame frame=new MainFrame(path.toString());
 		});
-		thread.start();
-		thread.join();
-		*/
+		/*Thread thread=new Thread(()->{
+		  while(true){
+		  frame.rotate(10);
+		  try{
+		  Thread.sleep(100);
+		  }catch(Exception exception){
+		  exception.printStackTrace();
+		  }
+		  }
+		  });
+		  thread.start();
+		  thread.join();
+		  */
 	}
 }

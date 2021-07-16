@@ -21,6 +21,10 @@ import java.awt.image.RescaleOp;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.BasicStroke;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import java.awt.Dimension;
 
 public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 	BufferedImage img;
@@ -38,13 +42,29 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 	float brightness;
 	public boolean cropMode;
 	public Rectangle rectangle;
+	
+	private JMenuBar menuBar;
+	private JMenu fileMenu;
+	private JMenuItem newMenuItem,openMenuItem,saveMenuItem,saveAsMenuItem,exitMenuItem;
+	private JMenu editMenu;
+	private JMenuItem brightnessMenuItem,increaseBrightnessMenuItem,decreaseBrightnessMenuItem;
+	private JMenuItem rotateMenuItem,rotateLeftMenuItem,rotateRightMenuItem;
+	private JMenuItem shiftMenuItem,shiftLeftMenuItem,shiftRightMenuItem,shiftUpMenuItem,shiftDownMenuItem;
+	private JMenuItem zoomMenuItem,zoomInMenuItem,zoomOutMenuItem;
+
+	private JMenu toolsMenu;
+	private JMenuItem cameraMenuItem;
+	//private JMenu settings;
+	//TODO move stuffs to JPanel's child class
 	public MainFrame(final String path){
 		this.path=path;
 		this.setTitle("EOS");
-		this.setSize(500,500);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.addComponentListener(this);
 		this.addKeyListener(this);
+		this.setSize(500,500);
+		initializeMenuBar();
+		//this.setLayout(null);
 		//loadImage(path);
 		zoom=1;
 		rotation=0;
@@ -53,12 +73,42 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 		rectangle=new Rectangle(0,0,0,0);
 		if(pictureExists(path))
 			loadImage(path);
-		else System.out.println(path+" not found");
+		else System.out.println(path+"Picture not found");
 		keysPressed=new LinkedHashSet<>();
+		//initializeMenuBar();
+		//pack();
 		this.setVisible(true);
 		System.out.println("Control : "+KeyEvent.VK_CONTROL);
 		System.out.println("Add : "+KeyEvent.VK_ADD);
 		//System.out.println("Title Bar height : "+getInsets().top);
+	}
+	private void initializeMenuBar(){
+		menuBar=new JMenuBar();
+		initializeFileMenu();
+		this.setJMenuBar(menuBar);
+		menuBar.setVisible(true);
+		//menuBar.revalidate();
+	}
+	private void initializeFileMenu(){
+		fileMenu=new JMenu();
+		newMenuItem=new JMenuItem("New");
+		openMenuItem=new JMenuItem("Open");
+		saveMenuItem=new JMenuItem("Save");
+		saveAsMenuItem=new JMenuItem("SaveAs");
+		exitMenuItem=new JMenuItem("Exit");
+		fileMenu.add(newMenuItem);
+		fileMenu.add(openMenuItem);
+		fileMenu.add(saveMenuItem);
+		fileMenu.add(saveAsMenuItem);
+		fileMenu.add(exitMenuItem);
+		fileMenu.setPreferredSize(new Dimension(100,50));
+		menuBar.add(fileMenu);
+	}
+	private void initializeEditMenu(){
+	}
+	private void initializeToolsMenu(){
+	}
+	private void initializeSettingsMenu(){
 	}
 	public static boolean pictureExists(final String path){
 		File file=new File(path);
@@ -290,8 +340,9 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 
 	@Override
 	public void paint(Graphics g){
+		//super.paint(g);
 		if(img!=null){
-			g.clearRect(0,0,getWidth(),getHeight());
+			//g.clearRect(0,0,getWidth(),getHeight());
 			final int tb=getTitleBarHeight();
 			System.out.println("title bar height : "+tb);
 			/*g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-(img.getHeight()-tb)/2+ver,
@@ -300,8 +351,9 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 			/*g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-img.getHeight()/2+ver,
 			  Math.min(img.getWidth(),getWidth()),Math.min(img.getHeight(),getHeight()),null);
 			  */
-			g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2+tb/2-img.getHeight()/2+ver,
-					img.getWidth(),img.getHeight(),null);
+			//g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2+tb/2-img.getHeight()/2+ver,
+			//		img.getWidth(),img.getHeight(),null);
+			super.paint(g);
 			if(cropMode && false){
 				//	Graphics2D _g=(Graphics2D)img.getGraphics();
 				Graphics _g=g;
@@ -314,6 +366,7 @@ public class MainFrame extends JFrame implements ComponentListener ,KeyListener{
 				//_g.setStroke(stroke);
 			}
 		}
+		//revalidate();
 	}
 	@Override
 	public void componentHidden(ComponentEvent event){}
