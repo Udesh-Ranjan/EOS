@@ -25,23 +25,13 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import java.awt.Dimension;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JFileChooser;
 
-public class MainFrame extends JFrame implements KeyListener,ComponentListener{
-	//BufferedImage img;
-	//InputStream stream;
-	//String path="/home/dev/Downloads/drk_beaver.jpg";
+public class MainFrame extends JFrame implements KeyListener,ComponentListener,ActionListener{
 	String path;
 	LinkedHashSet<Integer>keysPressed;
-	//double zoom;
-	//final static double incr=1.2;
-	//final static int move=5;//pixels
-	//final static float brightness_change=0.1f;
-	//boolean fileNoFound=false;
-	//double rotation;
-	//int hor,ver;
-	//float brightness;
-	//public boolean cropMode;
-	//public Rectangle rectangle;
 	
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
@@ -56,7 +46,7 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 	private JMenuItem cameraMenuItem;
 	private EOSPanel eosPanel;
 	//private JMenu settings;
-	//TODO move stuffs to JPanel's child class
+	private JFileChooser fileChooser;
 	public MainFrame(final String path){
 		this.path=path;
 		this.setTitle("EOS");
@@ -64,13 +54,7 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 		keysPressed=new LinkedHashSet<>();
 		this.setSize(500,500);
 		initializeMenuBar();
-		//this.setLayout(null);
-		//loadImage(path);
-		//zoom=1;
-		//rotation=0;
-		//hor=ver=0;
-		//brightness=1.0f;
-		//rectangle=new Rectangle(0,0,0,0);
+
 		this.addComponentListener(this);
 		this.addKeyListener(this);
 		if(pictureExists(path)){
@@ -78,7 +62,6 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 			add(eosPanel);
 		}
 		else System.out.println(path+" Picture not found in the path");
-		//initializeMenuBar();
 		//pack();
 		//setUndecorated(!false);
 		this.setVisible(true);
@@ -95,11 +78,22 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 	}
 	private void initializeFileMenu(){
 		fileMenu=new JMenu("File");
+
 		newMenuItem=new JMenuItem("New");
+		newMenuItem.addActionListener(this);
+
 		openMenuItem=new JMenuItem("Open");
+		openMenuItem.addActionListener(this);
+
 		saveMenuItem=new JMenuItem("Save");
+		saveMenuItem.addActionListener(this);
+
 		saveAsMenuItem=new JMenuItem("SaveAs");
+		saveAsMenuItem.addActionListener(this);
+
 		exitMenuItem=new JMenuItem("Exit");
+		exitMenuItem.addActionListener(this);
+
 		fileMenu.add(newMenuItem);
 		fileMenu.add(openMenuItem);
 		fileMenu.add(saveMenuItem);
@@ -125,264 +119,25 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 			return insets.top;
 		return 0;
 	}
-	/*public void loadImage(final String path){
-	  try{
-	  img=ImageIO.read(new File(path));
-	  final Image image=img.getScaledInstance(getWidth(),getHeight(),Image.SCALE_SMOOTH);
-	  img=new BufferedImage(getWidth(),getHeight(),BufferedImage.TYPE_4BYTE_ABGR);
-	  img.getGraphics().drawImage(image,0,0,this);
-	  }catch(final IOException ioException){
-	  ioException.printStackTrace();
-	  }
-	  repaint();
-	}
-	*/
-	/*public void loadImageMaintainAspectRatio(final String path){
-	  synchronized(this){
-	  try{
-	  if(img!=null){
-	  img.getGraphics().dispose();
-	  stream.close();
-	  img=null;
-	  }
-	  stream=new FileInputStream(path);
-	  img=ImageIO.read(stream);
-	  final float width=img.getWidth(),height=img.getHeight();
-	//img.getGraphics().dispose();
-	//stream.close();
-	final float ac=width/height;
-	System.out.println("ar: "+ac);
-	final int tb=getTitleBarHeight();
-	int new_width1=Math.min((int)width,getWidth());
-	int new_height1=Math.min((int)height,getHeight()-tb);
-	new_width1=(int)(new_height1*ac);
-	new_height1=(int)(new_width1*(1/ac));
-	int new_width2=Math.min((int)width,getWidth());
-	int new_height2=Math.min((int)height,getHeight()-tb);
-	new_height2=(int)(new_width2*(1/ac));
-	new_width2=(int)(new_height2*ac);
-	int new_width=Math.min(new_width1,new_width2);
-	int new_height=Math.min(new_height1,new_height2);
-	final Image image=img.getScaledInstance(new_width,new_height,Image.SCALE_SMOOTH);
-	img.getGraphics().dispose();
-	stream.close();
-	img.flush();
-	img=new BufferedImage(new_width,new_height,BufferedImage.TYPE_4BYTE_ABGR);
-	img.getGraphics().drawImage(image,0,0,this);
-	System.out.println("new size : "+new_width+","+new_height);
-	//image.dispose();TODO
-	}catch(final IOException ioException){
-	ioException.printStackTrace();
-	}
-	repaint();
-	  }
-	  }*/
-
-	/*public void loadImage(final String path){
-	  try{
-	  if(img!=null){
-	  img.getGraphics().dispose();
-	  stream.close();
-	  img.flush();
-	  img=null;
-	  }
-	  stream=new FileInputStream(path);
-	  final BufferedImage _img=ImageIO.read(stream);
-	  final float width=_img.getWidth(),height=_img.getHeight();
-	//img.getGraphics().dispose();
-	//stream.close();
-	//img.flush();
-	final float ac=width/height;
-	System.out.println("ar: "+ac);
-	final int tb=getTitleBarHeight();
-	int new_width1=Math.min((int)width,getWidth());
-	int new_height1=Math.min((int)height,getHeight()-tb);
-	new_width1=(int)(new_height1*ac);
-	new_height1=(int)(new_width1*(1/ac));
-	int new_width2=Math.min((int)width,getWidth());
-	int new_height2=Math.min((int)height,getHeight()-tb);
-	new_height2=(int)(new_width2*(1/ac));
-	new_width2=(int)(new_height2*ac);
-	int new_width=Math.min(new_width1,new_width2);
-	int new_height=Math.min(new_height1,new_height2);
-	new_width=(int)(zoom*new_width);
-	new_height=(int)(zoom*new_height);
-	if(new_width <=0 || new_height<=0){
-	System.out.println("Cannot zoomOut image is too small");
-	_img.getGraphics().dispose();
-	stream.close();
-	_img.flush();
-	return;
-	}
-	final Image image=_img.getScaledInstance(new_width,new_height,Image.SCALE_SMOOTH);
-	_img.getGraphics().dispose();
-	stream.close();
-	_img.flush();
-	img=new BufferedImage(new_width,new_height,BufferedImage.TYPE_4BYTE_ABGR);
-	img.getGraphics().drawImage(image,0,0,this);
-	changeBrightness();
-	//image.getGraphics().dispose();
-	System.out.println("new size : "+new_width+","+new_height);
-	//image.dispose();TODO
-	}catch(final IOException ioException){
-	ioException.printStackTrace();
-	}
-	repaint();
-	}
-	*/
-	/*public void loadImage(final String path){
-		synchronized(this){
-			try{
-				if(img!=null){
-					img.getGraphics().dispose();
-					stream.close();
-					img.flush();
-					img=null;
+	@Override
+	public void actionPerformed(final ActionEvent event){
+		if(event.getSource()==newMenuItem){
+			System.out.println("newMenuItem");
+			JFileChooser fileChooser=new JFileChooser();
+			fileChooser.setSelectionMode(JFileChooser.SAVE_DIALOG);
+			int retValue=fileChooser.showOpenDialog();
+			if(retValue==JFileChooser.APPROVE_OPTION){
+				System.out.println("approved");
+				File file=fileChooser.getSelectedFile();
+				if(file.exists() && !file.isDirectory() && file.isFile()){
+					final String path=file.getAbsolutePath();
+					eosPanel=new EOSPanel(path,getSize(),this);
 				}
-				stream=new FileInputStream(path);
-				final BufferedImage _img=ImageIO.read(stream);
-				final float width=_img.getWidth(),height=_img.getHeight();
-				//img.getGraphics().dispose();
-				//stream.close();
-				//img.flush();
-				final float ac=width/height;
-				System.out.println("ar: "+ac);
-				int tb=getTitleBarHeight();
-				int new_width1=Math.min((int)width,getWidth());
-				int new_height1=Math.min((int)height,getHeight()-tb);
-				new_width1=(int)(new_height1*ac);
-				new_height1=(int)(new_width1*(1/ac));
-				int new_width2=Math.min((int)width,getWidth());
-				int new_height2=Math.min((int)height,getHeight()-tb);
-				new_height2=(int)(new_width2*(1/ac));
-				new_width2=(int)(new_height2*ac);
-				int new_width=Math.min(new_width1,new_width2);
-				int new_height=Math.min(new_height1,new_height2);
-				new_width=(int)(zoom*new_width);
-				new_height=(int)(zoom*new_height);
-				if(new_width <=0 || new_height<=0){
-					System.out.println("Cannot zoomOut image is too small");
-					_img.getGraphics().dispose();
-					stream.close();
-					_img.flush();
-					return;
-				}
-				final Image image=_img.getScaledInstance(new_width,new_height,Image.SCALE_SMOOTH);
-				_img.getGraphics().dispose();
-				stream.close();
-				_img.flush();
-				final BufferedImage scaledImg=new BufferedImage(new_width,new_height,BufferedImage.TYPE_4BYTE_ABGR);
-				scaledImg.getGraphics().drawImage(image,0,0,this);
-				img=rotateImageByDegrees(scaledImg,rotation);
-				changeBrightness();
-				scaledImg.getGraphics().dispose();
-				scaledImg.flush();
-				//image.getGraphics().dispose();
-				System.out.println("new size : "+new_width+","+new_height);
-				//image.dispose();TODO
-			}catch(final IOException ioException){
-				ioException.printStackTrace();
 			}
-			repaint();
+
 		}
 	}
-	*/
-	/*public BufferedImage rotateImageByDegrees(final BufferedImage img,final double angle) {
-		final double rads = Math.toRadians(angle);
-		final double sin = Math.abs(Math.sin(rads)), cos = Math.abs(Math.cos(rads));
-		final int w = img.getWidth();
-		final int h = img.getHeight();
-		final int newWidth = (int) Math.floor(w * cos + h * sin);
-		final int newHeight = (int) Math.floor(h * cos + w * sin);
 
-		final BufferedImage rotated = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
-		final Graphics2D g2d = rotated.createGraphics();
-		final AffineTransform at = new AffineTransform();
-		at.translate((newWidth - w) / 2, (newHeight - h) / 2);
-
-		final int x = w / 2;
-		final int y = h / 2;
-
-		at.rotate(rads, x, y);
-		g2d.setTransform(at);
-		g2d.drawImage(img, 0, 0, this);
-		//g2d.setColor(Color.RED);
-		//g2d.drawRect(0, 0, newWidth - 1, newHeight - 1);
-		g2d.dispose();
-
-		return rotated;
-	}
-	*/
-	/*
-	public void zoomIn(){
-		System.out.println("zoomIn");
-		zoom=zoom*incr;
-		//loadImageMaintainAspectRatioAndZoom(path);
-		if(pictureExists(path))
-			loadImage(path);
-		else System.out.println(path+" not found");
-
-	}
-	*/
-	/*
-	public void zoomOut(){
-		System.out.println("zoomOut");
-		zoom=zoom/incr;
-		//loadImageMaintainAspectRatioAndZoom(path);
-		if(pictureExists(path))
-			loadImage(path);
-		else System.out.println(path+" not found");
-	}
-	*/
-	/*
-	public void rotate(final double angle){
-		System.out.println("rotate");
-		hor=ver=0;
-		rotation+=angle;
-		if(pictureExists(path))
-			loadImage(path);
-		else System.out.println(path+" not found");
-	}
-	*/
-	/*
-	public void moveImage(final int HORIZONTAL,final int VERTICAL){
-		hor+=HORIZONTAL;
-		ver+=VERTICAL;
-		repaint();
-	}
-	*/
-
-	/*@Override
-	public void paint(Graphics g){
-		//super.paint(g);
-		if(img!=null){
-			//g.clearRect(0,0,getWidth(),getHeight());
-			final int tb=getTitleBarHeight();
-			System.out.println("title bar height : "+tb);
-			//g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-(img.getHeight()-tb)/2+ver,
-			//  Math.min(img.getWidth(),getWidth()),Math.min(img.getHeight(),getHeight()),this);
-			//
-			//g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-img.getHeight()/2+ver,
-			//  Math.min(img.getWidth(),getWidth()),Math.min(img.getHeight(),getHeight()),null);
-			  
-			//g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2+tb/2-img.getHeight()/2+ver,
-			//		img.getWidth(),img.getHeight(),null);
-			super.paint(g);
-			if(cropMode && false){
-				//	Graphics2D _g=(Graphics2D)img.getGraphics();
-				Graphics _g=g;
-				Color c=_g.getColor();
-				_g.setColor(Color.cyan);
-				//Stroke stroke=_g.getStroke();
-				//_g.setStroke(new BasicStroke(20));	
-				_g.drawRect(rectangle.x,rectangle.y,rectangle.width,rectangle.height);
-				_g.setColor(c);
-				//_g.setStroke(stroke);
-			}
-		}
-		//revalidate();
-	}
-	*/
 	@Override
 	public void componentHidden(ComponentEvent event){}
 	@Override
@@ -406,8 +161,10 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 	public void componentMoved(ComponentEvent event){}
 	@Override
 	public void keyPressed(KeyEvent event){
+		final int KEY=event.getKeyCode();
+		keysPressed.add(KEY);
 		if(eosPanel!=null){
-			eosPanel.keyPressed(event);
+			eosPanel.keyPressed(event,keysPressed);
 		}
 		/*System.out.println("Pressed : "+event.getKeyCode());
 		final int KEY=event.getKeyCode();
@@ -545,24 +302,19 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener{
 		  
 		*/
 	}
-	/*
-	public void changeBrightness(){
-		if(pictureExists(path)){
-			final BufferedImage prev=img;
-			final RescaleOp op=new RescaleOp(brightness,0,null);
-			img=op.filter(img,null);
-		}
-		else System.out.println(path+" not found");
-	}	
-	*/
 
 	@Override
-	public void keyTyped(KeyEvent event){}
+	public void keyTyped(KeyEvent event){
+		final int KEY=event.getKeyCode();
+		keysPressed.add(KEY);
+	}
 	@Override
 	public void keyReleased(KeyEvent event){
+		final int KEY=event.getKeyCode();
 		if(eosPanel!=null){
-			eosPanel.keyReleased(event);
+			eosPanel.keyReleased(event,keysPressed);
 		}
+		keysPressed.remove(KEY);
 		/*System.out.println("Released : "+event.getKeyCode());
 		final int KEY=event.getKeyCode();
 		keysPressed.remove(KEY);

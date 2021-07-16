@@ -32,7 +32,7 @@ public class EOSPanel extends JPanel /*implements ComponentListener,KeyListener*
 	InputStream stream;
 	//String path="/home/dev/Downloads/drk_beaver.jpg";
 	String path;
-	LinkedHashSet<Integer>keysPressed;
+	//LinkedHashSet<Integer>keysPressed;
 	double zoom;
 	final static double incr=1.2;
 	final static int move=5;//pixels
@@ -65,7 +65,7 @@ public class EOSPanel extends JPanel /*implements ComponentListener,KeyListener*
 		if(pictureExists(path))
 			loadImage(path);
 		else System.out.println(path+"Picture not found");
-		keysPressed=new LinkedHashSet<>();
+		//keysPressed=new LinkedHashSet<>();
 		//initializeMenuBar();
 		//pack();
 		this.setVisible(true);
@@ -348,12 +348,21 @@ public class EOSPanel extends JPanel /*implements ComponentListener,KeyListener*
 	}
 	//@Override
 	public void componentMoved(ComponentEvent event){}
+
+	public void changeBrightness(){
+		if(pictureExists(path)){
+			final BufferedImage prev=img;
+			final RescaleOp op=new RescaleOp(brightness,0,null);
+			img=op.filter(img,null);
+		}
+		else System.out.println(path+" not found");
+	}
 	//@Override
-	public void keyPressed(KeyEvent event){
+	public void keyPressed(final KeyEvent event,final LinkedHashSet<Integer>keysPressed){
 		System.out.println("Pressed : "+event.getKeyCode());
 		final int KEY=event.getKeyCode();
-		keysPressed.add(KEY);
-		System.out.println(keysPressed);
+		//keysPressed.add(KEY);
+		//System.out.println(keysPressed);
 		boolean exe=false;
 		if(cropMode){
 			if(KEY==KeyEvent.VK_ENTER){
@@ -485,27 +494,19 @@ public class EOSPanel extends JPanel /*implements ComponentListener,KeyListener*
 		  }
 		  */
 	}
-	public void changeBrightness(){
-		if(pictureExists(path)){
-			final BufferedImage prev=img;
-			final RescaleOp op=new RescaleOp(brightness,0,null);
-			img=op.filter(img,null);
-		}
-		else System.out.println(path+" not found");
-	}	
 
 	//@Override
-	public void keyTyped(KeyEvent event){}
+	public void keyTyped(final KeyEvent event,final LinkedHashSet<Integer>keysPressed){}
 	//@Override
-	public void keyReleased(KeyEvent event){
+	public void keyReleased(final KeyEvent event,final LinkedHashSet<Integer>keysPressed){
 		System.out.println("Released : "+event.getKeyCode());
 		final int KEY=event.getKeyCode();
-		keysPressed.remove(KEY);
-		System.out.println(keysPressed);
+		//keysPressed.remove(KEY);
+		//System.out.println(keysPressed);
 
 	}
 	@Override
-	public void paintComponent(Graphics g){
+	public void paintComponent(final Graphics g){
 		System.out.println("paintComponent");
 		super.paintComponent(g);
 		//super.paint(g);
