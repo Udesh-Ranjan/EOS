@@ -27,7 +27,7 @@ import javax.swing.JMenuItem;
 import java.awt.Dimension;
 import javax.swing.JPanel;
 
-public class EOSPanel extends JPanel /*implements ComponentListener,KeyListener*/{
+public class EOSPanel extends JPanel {
 	BufferedImage img;
 	InputStream stream;
 	//String path="/home/dev/Downloads/drk_beaver.jpg";
@@ -69,6 +69,7 @@ public class EOSPanel extends JPanel /*implements ComponentListener,KeyListener*
 		//initializeMenuBar();
 		//pack();
 		this.setVisible(true);
+		//this.addKeyListener(this);
 		System.out.println("Control : "+KeyEvent.VK_CONTROL);
 		System.out.println("Add : "+KeyEvent.VK_ADD);
 		//System.out.println("Title Bar height : "+getInsets().top);
@@ -357,6 +358,15 @@ public class EOSPanel extends JPanel /*implements ComponentListener,KeyListener*
 		}
 		else System.out.println(path+" not found");
 	}
+	/*
+	public void keyPressed(final KeyEvent event){
+		System.out.println("pressed");
+	}
+	public void keyReleased(final KeyEvent event){
+	}
+	public void keyTyped(final KeyEvent event){
+	}
+	*/
 	//@Override
 	public void keyPressed(final KeyEvent event,final LinkedHashSet<Integer>keysPressed){
 		System.out.println("Pressed : "+event.getKeyCode());

@@ -28,11 +28,12 @@ import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JFileChooser;
+import javax.swing.JTabbedPane;
 
 public class MainFrame extends JFrame implements KeyListener,ComponentListener,ActionListener{
 	String path;
-	LinkedHashSet<Integer>keysPressed;
-	
+	final LinkedHashSet<Integer>keysPressed;
+
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
 	private JMenuItem newMenuItem,openMenuItem,saveMenuItem,saveAsMenuItem,exitMenuItem;
@@ -46,20 +47,30 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 	private JMenuItem cameraMenuItem;
 	private EOSPanel eosPanel;
 	//private JMenu settings;
+	final private JTabbedPane tabbedPane;
 	private JFileChooser fileChooser;
 	public MainFrame(final String path){
 		this.path=path;
 		this.setTitle("EOS");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		keysPressed=new LinkedHashSet<>();
+		tabbedPane=new JTabbedPane();
+		add(tabbedPane);
 		this.setSize(500,500);
 		initializeMenuBar();
 
 		this.addComponentListener(this);
 		this.addKeyListener(this);
+		requestFocus();
+		//setFocusable is important to register the keys
+		setFocusable(true);
 		if(pictureExists(path)){
+			/*File file=new File(path);
 			eosPanel=new EOSPanel(path,getSize(),this);
-			add(eosPanel);
+			tabbedPane.add(file.getName(),eosPanel);
+			tabbedPane.setTabComponentAt(tabbedPane.getSelectedIndex(),new ButtonTabComponent(tabbedPane));
+			*/
+			addToTabbedPane(path);
 		}
 		else System.out.println(path+" Picture not found in the path");
 		//pack();
@@ -68,6 +79,13 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 		System.out.println("Control : "+KeyEvent.VK_CONTROL);
 		System.out.println("Add : "+KeyEvent.VK_ADD);
 		//System.out.println("Title Bar height : "+getInsets().top);
+	}
+	private void addToTabbedPane(final String path){
+			File file=new File(path);
+			eosPanel=new EOSPanel(path,getSize(),this);
+			tabbedPane.add(file.getName(),eosPanel);
+			tabbedPane.setTabComponentAt(tabbedPane.getTabCount()-1,new ButtonTabComponent(tabbedPane));
+			tabbedPane.setSelectedComponent(eosPanel);
 	}
 	private void initializeMenuBar(){
 		menuBar=new JMenuBar();
@@ -119,23 +137,24 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 			return insets.top;
 		return 0;
 	}
+	//TODO implement it
 	@Override
 	public void actionPerformed(final ActionEvent event){
 		if(event.getSource()==newMenuItem){
 			System.out.println("newMenuItem");
 			JFileChooser fileChooser=new JFileChooser();
-			fileChooser.setSelectionMode(JFileChooser.SAVE_DIALOG);
-			int retValue=fileChooser.showOpenDialog();
+			fileChooser.setFileSelectionMode(JFileChooser.OPEN_DIALOG);
+			int retValue=fileChooser.showOpenDialog(this);
 			if(retValue==JFileChooser.APPROVE_OPTION){
 				System.out.println("approved");
 				File file=fileChooser.getSelectedFile();
 				if(file.exists() && !file.isDirectory() && file.isFile()){
-					final String path=file.getAbsolutePath();
-					eosPanel=new EOSPanel(path,getSize(),this);
+					addToTabbedPane(file.getAbsolutePath());
 				}
 			}
 
 		}
+
 	}
 
 	@Override
@@ -145,15 +164,18 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 	@Override
 	public void componentResized(ComponentEvent event){
 		/*System.out.println("size : "+getWidth()+","+getHeight());
-		hor=ver=0;
-		rotation=0;
-		cropMode=false;
+		  hor=ver=0;
+		  rotation=0;
+		  cropMode=false;
 		//loadImage(path);
 		if(pictureExists(path))
-			loadImage(path);
+		loadImage(path);
 		else System.out.println(path+" not found");
 		*/
-		if(eosPanel!=null){
+		System.out.println("component resized");
+		final int tabCount=tabbedPane.getTabCount();
+		for(int i=0;i<tabCount;i++){
+			final EOSPanel eosPanel=(EOSPanel)tabbedPane.getComponentAt(i);
 			eosPanel.componentResized(event);
 		}
 	}
@@ -161,146 +183,148 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 	public void componentMoved(ComponentEvent event){}
 	@Override
 	public void keyPressed(KeyEvent event){
+		System.out.println("Keys Pressed");
 		final int KEY=event.getKeyCode();
 		keysPressed.add(KEY);
+		final EOSPanel eosPanel=(EOSPanel)tabbedPane.getSelectedComponent();
 		if(eosPanel!=null){
 			eosPanel.keyPressed(event,keysPressed);
 		}
 		/*System.out.println("Pressed : "+event.getKeyCode());
-		final int KEY=event.getKeyCode();
-		keysPressed.add(KEY);
-		System.out.println(keysPressed);
-		boolean exe=false;
-		if(cropMode){
-			if(KEY==KeyEvent.VK_ENTER){
-				//TODO
-				//save the select region to new bufferedimage
-			}
-			if(KEY==KeyEvent.VK_LEFT){
-				if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-					rectangle.width--;
-				}else{
-					rectangle.x--;
-					rectangle.width++;
-				}
-				exe=true;
-			}
-			if(KEY==KeyEvent.VK_RIGHT){
-				if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-					rectangle.width++;
-				}else{
-					rectangle.x++;
-					rectangle.width--;
-				}
-				exe=true;
-			}
-			if(KEY==KeyEvent.VK_UP){
-				if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-					rectangle.height--;
-				}else{
-					rectangle.y--;
-					rectangle.height++;
-				}
-				exe=true;
-			}
-			if(KEY==KeyEvent.VK_DOWN){
-				if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-					rectangle.height++;
-				}else{
-					rectangle.y++;
-					rectangle.height--;
-				}
-				exe=true;
-			}
-			if(exe){
-				repaint();
-				return;
-			}
-		}
-		if(KEY==KeyEvent.VK_ADD){
-			System.out.println("Add");
-			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-				System.out.println("found");
-				zoomIn();
-				exe=true;
-			}
-		}
-		if(KEY==KeyEvent.VK_SUBTRACT){
-			System.out.println("Minus");
-			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-				System.out.println("found");
-				zoomOut();
-				exe=true;
-			}
-		}
-		if(KEY==KeyEvent.VK_LEFT){
-			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-				System.out.println("rotate left");
-				rotate(-10);
-				exe=true;
+		  final int KEY=event.getKeyCode();
+		  keysPressed.add(KEY);
+		  System.out.println(keysPressed);
+		  boolean exe=false;
+		  if(cropMode){
+		  if(KEY==KeyEvent.VK_ENTER){
+		//TODO
+		//save the select region to new bufferedimage
+		  }
+		  if(KEY==KeyEvent.VK_LEFT){
+		  if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+		  rectangle.width--;
+		  }else{
+		  rectangle.x--;
+		  rectangle.width++;
+		  }
+		  exe=true;
+		  }
+		  if(KEY==KeyEvent.VK_RIGHT){
+		  if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+		  rectangle.width++;
+		  }else{
+		  rectangle.x++;
+		  rectangle.width--;
+		  }
+		  exe=true;
+		  }
+		  if(KEY==KeyEvent.VK_UP){
+		  if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+		  rectangle.height--;
+		  }else{
+		  rectangle.y--;
+		  rectangle.height++;
+		  }
+		  exe=true;
+		  }
+		  if(KEY==KeyEvent.VK_DOWN){
+		  if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+		  rectangle.height++;
+		  }else{
+		  rectangle.y++;
+		  rectangle.height--;
+		  }
+		  exe=true;
+		  }
+		  if(exe){
+		  repaint();
+		  return;
+		  }
+		  }
+		  if(KEY==KeyEvent.VK_ADD){
+		  System.out.println("Add");
+		  if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+		  System.out.println("found");
+		  zoomIn();
+		  exe=true;
+		  }
+		  }
+		  if(KEY==KeyEvent.VK_SUBTRACT){
+		  System.out.println("Minus");
+		  if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+		  System.out.println("found");
+		  zoomOut();
+		  exe=true;
+		  }
+		  }
+		  if(KEY==KeyEvent.VK_LEFT){
+		  if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+		  System.out.println("rotate left");
+		  rotate(-10);
+		exe=true;
 
-			}
+		  }
+		  }
+	if(KEY==KeyEvent.VK_RIGHT){
+		if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+			System.out.println("rotate right");
+			rotate(10);
+			exe=true;
 		}
-		if(KEY==KeyEvent.VK_RIGHT){
-			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-				System.out.println("rotate right");
-				rotate(10);
-				exe=true;
-			}
+	}
+	if(KEY==KeyEvent.VK_UP){
+		if(!exe){
+			moveImage(0,-move);
+			exe=true;
 		}
-		if(KEY==KeyEvent.VK_UP){
-			if(!exe){
-				moveImage(0,-move);
-				exe=true;
-			}
+	}
+	if(KEY==KeyEvent.VK_DOWN){
+		if(!exe){
+			moveImage(0,move);
+			exe=true;
 		}
-		if(KEY==KeyEvent.VK_DOWN){
-			if(!exe){
-				moveImage(0,move);
-				exe=true;
-			}
+	}
+	if(KEY==KeyEvent.VK_LEFT){
+		if(!exe){
+			moveImage(-move,0);
+			exe=true;
 		}
-		if(KEY==KeyEvent.VK_LEFT){
-			if(!exe){
-				moveImage(-move,0);
-				exe=true;
-			}
+	}
+	if(KEY==KeyEvent.VK_RIGHT){
+		if(!exe){
+			moveImage(move,0);
+			exe=true;
 		}
-		if(KEY==KeyEvent.VK_RIGHT){
-			if(!exe){
-				moveImage(move,0);
-				exe=true;
-			}
+	}
+	if(KEY==KeyEvent.VK_B)
+		if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+			brightness+=(brightness_change*(keysPressed.contains(KeyEvent.VK_SHIFT)?-1:1));	
+			loadImage(path);
+			//changeBrightness(brightness_change*(keysPressed.contains(KeyEvent.VK_SHIFT)?-1:1));
+			exe=true;
 		}
-		if(KEY==KeyEvent.VK_B)
-			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-				brightness+=(brightness_change*(keysPressed.contains(KeyEvent.VK_SHIFT)?-1:1));	
-				loadImage(path);
-				//changeBrightness(brightness_change*(keysPressed.contains(KeyEvent.VK_SHIFT)?-1:1));
-				exe=true;
-			}
-		if(KEY==KeyEvent.VK_C)
-			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-				cropMode=true;
-				final int width=50,height=50;
-				rectangle.width=width;
-				rectangle.height=height;
-				rectangle.x=getWidth()/2-width/2;
-				rectangle.y=getHeight()/2-height/2;
-			}
-		if(KEY==KeyEvent.VK_ESCAPE){
-			if(cropMode){
-				cropMode=false;
-				repaint();
-			}
+	if(KEY==KeyEvent.VK_C)
+		if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+			cropMode=true;
+			final int width=50,height=50;
+			rectangle.width=width;
+			rectangle.height=height;
+			rectangle.x=getWidth()/2-width/2;
+			rectangle.y=getHeight()/2-height/2;
 		}
-		//if(KEY==KeyEvent.VK_B)
-		//  if(keysPressed.contains(KeyEvent.VK_CONTROL) && keysPressed.contains(KeyEvent.VK_SHIFT)){
-		//  changeBrightness(-brightness_change);
-		//  exe=true;
-		//  }
-		  
-		*/
+	if(KEY==KeyEvent.VK_ESCAPE){
+		if(cropMode){
+			cropMode=false;
+			repaint();
+		}
+	}
+	//if(KEY==KeyEvent.VK_B)
+	//  if(keysPressed.contains(KeyEvent.VK_CONTROL) && keysPressed.contains(KeyEvent.VK_SHIFT)){
+	//  changeBrightness(-brightness_change);
+	//  exe=true;
+	//  }
+
+	*/
 	}
 
 	@Override
@@ -311,15 +335,16 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 	@Override
 	public void keyReleased(KeyEvent event){
 		final int KEY=event.getKeyCode();
+		final EOSPanel eosPanel=(EOSPanel)tabbedPane.getSelectedComponent();
 		if(eosPanel!=null){
 			eosPanel.keyReleased(event,keysPressed);
 		}
 		keysPressed.remove(KEY);
 		/*System.out.println("Released : "+event.getKeyCode());
-		final int KEY=event.getKeyCode();
-		keysPressed.remove(KEY);
-		System.out.println(keysPressed);
-		*/
+		  final int KEY=event.getKeyCode();
+		  keysPressed.remove(KEY);
+		  System.out.println(keysPressed);
+		  */
 
 	}
 }
