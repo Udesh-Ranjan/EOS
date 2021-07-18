@@ -32,6 +32,9 @@ import javax.swing.JTabbedPane;
 import java.awt.event.InputEvent;
 import javax.swing.KeyStroke;
 import java.io.FileWriter;
+import java.util.Random;
+import java.awt.AWTException;
+import java.awt.Robot;
 
 public class MainFrame extends JFrame implements KeyListener,ComponentListener,ActionListener{
 	String path;
@@ -48,6 +51,7 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 
 	private JMenu toolsMenu;
 	private JMenuItem cameraMenuItem;
+	private JMenuItem screenShotMenuItem;
 	private EOSPanel eosPanel;
 	//private JMenu settings;
 	final private JTabbedPane tabbedPane;
@@ -81,6 +85,7 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 		this.setVisible(true);
 		System.out.println("Control : "+KeyEvent.VK_CONTROL);
 		System.out.println("Add : "+KeyEvent.VK_ADD);
+		System.out.println("Present working directory : "+System.getProperty("user.dir"));
 		//System.out.println("Title Bar height : "+getInsets().top);
 	}
 	private void addToTabbedPane(final String path){
@@ -93,6 +98,7 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 	private void initializeMenuBar(){
 		menuBar=new JMenuBar();
 		initializeFileMenu();
+		initializeToolsMenu();
 		this.setJMenuBar(menuBar);
 		//menuBar.setVisible(true);
 		//menuBar.revalidate();
@@ -132,6 +138,15 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 	private void initializeEditMenu(){
 	}
 	private void initializeToolsMenu(){
+		toolsMenu=new JMenu("Tools");
+		toolsMenu.setMnemonic(KeyEvent.VK_T);
+
+		screenShotMenuItem=new JMenuItem("ScreenShot");
+		screenShotMenuItem.addActionListener(this);
+		screenShotMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.CTRL_DOWN_MASK+InputEvent.SHIFT_DOWN_MASK));
+
+		toolsMenu.add(screenShotMenuItem);
+		menuBar.add(toolsMenu);
 	}
 	private void initializeSettingsMenu(){
 	}
@@ -189,6 +204,20 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 			System.out.println("exiting");
 			System.exit(0);
 		}
+		if(event.getSource()==screenShotMenuItem){
+			System.out.println("screenShot");
+			final String str=generateRandomString(20);
+			System.out.println("RandomString generated : "+str);
+			final String path=System.getProperty("user.dir")+"/"+str+".png";
+			final BufferedImage image=captureScreen();
+			try{
+				ImageIO.write(image,"png",new File(path));
+				addToTabbedPane(path);
+			}catch(IOException ioException){
+				ioException.printStackTrace();
+				System.out.println("cannot add to the tabbed pane");
+			}
+		}
 
 	}
 	private void save(){
@@ -230,7 +259,31 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 		}
 	}
 	private void saveAs(){
-
+		save();
+	}
+	private BufferedImage captureScreen(){
+		Robot robot=null;
+		try{
+			robot=new Robot();
+		}catch(final AWTException awtException){
+			awtException.printStackTrace();
+			return null;
+		}
+		return robot.createScreenCapture(new Rectangle(java.awt.Toolkit.getDefaultToolkit().getScreenSize()));
+	}
+	private String generateRandomString(int size){
+		final Random random=new Random();
+		final StringBuilder str=new StringBuilder();
+		for(int i=0;i<size;i++){
+			int val;
+			if((random.nextInt()&1)==0){
+				val=Math.abs(random.nextInt()%26)+65;
+			}else{
+				val=Math.abs(random.nextInt()%26)+97;
+			}
+			str.append((char)val);
+		}
+		return str.toString();
 	}
 
 	@Override
