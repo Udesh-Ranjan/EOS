@@ -35,6 +35,7 @@ import java.io.FileWriter;
 import java.util.Random;
 import java.awt.AWTException;
 import java.awt.Robot;
+import com.github.sarxos.webcam.Webcam;
 
 public class MainFrame extends JFrame implements KeyListener,ComponentListener,ActionListener{
 	String path;
@@ -145,7 +146,13 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 		screenShotMenuItem.addActionListener(this);
 		screenShotMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.CTRL_DOWN_MASK+InputEvent.SHIFT_DOWN_MASK));
 
+		cameraMenuItem=new JMenuItem("Camera");
+		cameraMenuItem.addActionListener(this);
+		cameraMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,InputEvent.CTRL_DOWN_MASK));
+
 		toolsMenu.add(screenShotMenuItem);
+		toolsMenu.add(cameraMenuItem);
+
 		menuBar.add(toolsMenu);
 	}
 	private void initializeSettingsMenu(){
@@ -218,6 +225,26 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 				System.out.println("cannot add to the tabbed pane");
 			}
 		}
+		if(event.getSource()==cameraMenuItem){
+			System.out.println("WebCam");
+			captureImage();
+		}
+
+	}
+	private void captureImage(){
+		try{
+			final Webcam webcam=Webcam.getDefault();
+			webcam.open();
+			final BufferedImage image=webcam.getImage();
+			final String str=generateRandomString(20);
+			System.out.println("RandomString generated : "+str);
+			final String path=System.getProperty("user.dir")+"/"+str+".jpg";
+			ImageIO.write(image,"jpg",new File(path));
+			addToTabbedPane(path);
+		}catch(IOException ioException){
+			ioException.printStackTrace();
+			System.out.println("cannot add to the tabbed pane");
+		}
 
 	}
 	private void save(){
@@ -263,13 +290,18 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 	}
 	private BufferedImage captureScreen(){
 		Robot robot=null;
+		this.setVisible(false);
+		BufferedImage image=null;
 		try{
+			//we are delaying it for some time so the frame is not visible
+			Thread.sleep(500);
 			robot=new Robot();
-		}catch(final AWTException awtException){
-			awtException.printStackTrace();
-			return null;
+			image=robot.createScreenCapture(new Rectangle(java.awt.Toolkit.getDefaultToolkit().getScreenSize()));
+		}catch(final InterruptedException | AWTException exception){
+			exception.printStackTrace();
 		}
-		return robot.createScreenCapture(new Rectangle(java.awt.Toolkit.getDefaultToolkit().getScreenSize()));
+		this.setVisible(true);
+		return image;
 	}
 	private String generateRandomString(int size){
 		final Random random=new Random();
