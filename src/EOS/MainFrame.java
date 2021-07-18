@@ -29,6 +29,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JFileChooser;
 import javax.swing.JTabbedPane;
+import java.awt.event.InputEvent;
+import javax.swing.KeyStroke;
+import java.io.FileWriter;
 
 public class MainFrame extends JFrame implements KeyListener,ComponentListener,ActionListener{
 	String path;
@@ -66,10 +69,10 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 		setFocusable(true);
 		if(pictureExists(path)){
 			/*File file=new File(path);
-			eosPanel=new EOSPanel(path,getSize(),this);
-			tabbedPane.add(file.getName(),eosPanel);
-			tabbedPane.setTabComponentAt(tabbedPane.getSelectedIndex(),new ButtonTabComponent(tabbedPane));
-			*/
+			  eosPanel=new EOSPanel(path,getSize(),this);
+			  tabbedPane.add(file.getName(),eosPanel);
+			  tabbedPane.setTabComponentAt(tabbedPane.getSelectedIndex(),new ButtonTabComponent(tabbedPane));
+			  */
 			addToTabbedPane(path);
 		}
 		else System.out.println(path+" Picture not found in the path");
@@ -81,11 +84,11 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 		//System.out.println("Title Bar height : "+getInsets().top);
 	}
 	private void addToTabbedPane(final String path){
-			File file=new File(path);
-			eosPanel=new EOSPanel(path,getSize(),this);
-			tabbedPane.add(file.getName(),eosPanel);
-			tabbedPane.setTabComponentAt(tabbedPane.getTabCount()-1,new ButtonTabComponent(tabbedPane));
-			tabbedPane.setSelectedComponent(eosPanel);
+		File file=new File(path);
+		eosPanel=new EOSPanel(path,getSize(),this);
+		tabbedPane.add(file.getName(),eosPanel);
+		tabbedPane.setTabComponentAt(tabbedPane.getTabCount()-1,new ButtonTabComponent(tabbedPane));
+		tabbedPane.setSelectedComponent(eosPanel);
 	}
 	private void initializeMenuBar(){
 		menuBar=new JMenuBar();
@@ -96,21 +99,27 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 	}
 	private void initializeFileMenu(){
 		fileMenu=new JMenu("File");
+		fileMenu.setMnemonic(KeyEvent.VK_F);
 
 		newMenuItem=new JMenuItem("New");
 		newMenuItem.addActionListener(this);
+		newMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,InputEvent.CTRL_DOWN_MASK));
 
 		openMenuItem=new JMenuItem("Open");
 		openMenuItem.addActionListener(this);
+		openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,InputEvent.CTRL_DOWN_MASK));
 
 		saveMenuItem=new JMenuItem("Save");
 		saveMenuItem.addActionListener(this);
+		saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.CTRL_DOWN_MASK));
 
 		saveAsMenuItem=new JMenuItem("SaveAs");
 		saveAsMenuItem.addActionListener(this);
+		saveAsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A,InputEvent.CTRL_DOWN_MASK+InputEvent.SHIFT_DOWN_MASK));
 
 		exitMenuItem=new JMenuItem("Exit");
 		exitMenuItem.addActionListener(this);
+		exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4,InputEvent.ALT_DOWN_MASK));
 
 		fileMenu.add(newMenuItem);
 		fileMenu.add(openMenuItem);
@@ -154,6 +163,73 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 			}
 
 		}
+		if(event.getSource()==openMenuItem){
+			System.out.println("OpenMenuItem");
+			JFileChooser fileChooser=new JFileChooser();
+			fileChooser.setFileSelectionMode(JFileChooser.OPEN_DIALOG);
+			int retValue=fileChooser.showOpenDialog(this);
+			if(retValue==JFileChooser.APPROVE_OPTION){
+				System.out.println("approved");
+				File file=fileChooser.getSelectedFile();
+				if(file.exists() && !file.isDirectory() && file.isFile()){
+					addToTabbedPane(file.getAbsolutePath());
+				}
+			}
+
+		}
+		if(event.getSource()==saveMenuItem){
+			System.out.println("SaveMenuItem");
+			save();
+		}
+		if(event.getSource()==saveAsMenuItem){
+			System.out.println("SaveAs");
+			saveAs();
+		}
+		if(event.getSource()==exitMenuItem){
+			System.out.println("exiting");
+			System.exit(0);
+		}
+
+	}
+	private void save(){
+		final EOSPanel eosPanel=(EOSPanel)tabbedPane.getSelectedComponent();
+		if(eosPanel==null){
+			System.out.println("no component selected");
+		}
+		else{
+			final JFileChooser fileChooser=new JFileChooser();
+			fileChooser.setFileSelectionMode(JFileChooser.SAVE_DIALOG);
+			final int retValue=fileChooser.showSaveDialog(this);
+			if(retValue==JFileChooser.APPROVE_OPTION){
+				System.out.println("approved");
+				final File file=fileChooser.getSelectedFile();
+				final String path=file.getAbsolutePath();
+				System.out.println(path);
+				String extension=null;
+				for(int i=path.length()-1;i>=0;i--)
+					if(path.charAt(i)=='.'){
+						extension=path.substring(i+1,path.length());
+						break;
+					}
+				System.out.println("extension:"+extension);
+				if(extension!=null && extension.length() > 0){
+					//addToTabbedPane(file.getAbsolutePath());
+					try{
+						//final FileWriter fileWriter=new FileWriter(file);
+						//fileWriter.write();
+						//fileWriter.close();
+						ImageIO.write(eosPanel.img,extension,file);
+						System.out.println("Image is saved");
+					}catch(final IOException ioException){
+						ioException.printStackTrace();
+					}
+				}else{
+					System.out.println("Please enter a valid extension for file");
+				}
+			}
+		}
+	}
+	private void saveAs(){
 
 	}
 

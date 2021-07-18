@@ -28,10 +28,10 @@ import java.awt.Dimension;
 import javax.swing.JPanel;
 
 public class EOSPanel extends JPanel {
-	BufferedImage img;
+	public BufferedImage img;
 	InputStream stream;
 	//String path="/home/dev/Downloads/drk_beaver.jpg";
-	String path;
+	public String path;
 	//LinkedHashSet<Integer>keysPressed;
 	double zoom;
 	final static double incr=1.2;
@@ -43,7 +43,7 @@ public class EOSPanel extends JPanel {
 	float brightness;
 	public boolean cropMode;
 	public Rectangle rectangle;
-	
+
 	private final MainFrame mainFrame;
 	//private JMenu settings;
 	//TODO move stuffs to JPanel's child class
@@ -302,249 +302,249 @@ public class EOSPanel extends JPanel {
 		repaint();
 	}
 	/*
-	@Override
-	public void paint(Graphics g){
-		//super.paint(g);
-		if(img!=null){
-			//g.clearRect(0,0,getWidth(),getHeight());
-			final int tb=getTitleBarHeight();
-			System.out.println("title bar height : "+tb);
-			//g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-(img.getHeight()-tb)/2+ver,
-			//  Math.min(img.getWidth(),getWidth()),Math.min(img.getHeight(),getHeight()),this);
-			//g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-img.getHeight()/2+ver,
-			//  Math.min(img.getWidth(),getWidth()),Math.min(img.getHeight(),getHeight()),null);
-			//g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2+tb/2-img.getHeight()/2+ver,
-			//		img.getWidth(),img.getHeight(),null);
-			super.paint(g);
-			if(cropMode && false){
-				//	Graphics2D _g=(Graphics2D)img.getGraphics();
-				Graphics _g=g;
-				Color c=_g.getColor();
-				_g.setColor(Color.cyan);
-				//Stroke stroke=_g.getStroke();
-				//_g.setStroke(new BasicStroke(20));	
-				_g.drawRect(rectangle.x,rectangle.y,rectangle.width,rectangle.height);
-				_g.setColor(c);
-				//_g.setStroke(stroke);
-			}
-		}
-		//revalidate();
-	}
-	*/
-	//@Override
-	public void componentHidden(ComponentEvent event){}
-	//@Override
-	public void componentShown(ComponentEvent event){}
-	//@Override
-	public void componentResized(ComponentEvent event){
-		System.out.println("size : "+getWidth()+","+getHeight());
-		hor=ver=0;
-		rotation=0;
-		cropMode=false;
-		//loadImage(path);
-		if(pictureExists(path))
-			loadImage(path);
-		else System.out.println(path+" not found");
+	   @Override
+	   public void paint(Graphics g){
+//super.paint(g);
+if(img!=null){
+//g.clearRect(0,0,getWidth(),getHeight());
+final int tb=getTitleBarHeight();
+System.out.println("title bar height : "+tb);
+//g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-(img.getHeight()-tb)/2+ver,
+//  Math.min(img.getWidth(),getWidth()),Math.min(img.getHeight(),getHeight()),this);
+//g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-img.getHeight()/2+ver,
+//  Math.min(img.getWidth(),getWidth()),Math.min(img.getHeight(),getHeight()),null);
+//g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2+tb/2-img.getHeight()/2+ver,
+//		img.getWidth(),img.getHeight(),null);
+super.paint(g);
+if(cropMode && false){
+//	Graphics2D _g=(Graphics2D)img.getGraphics();
+Graphics _g=g;
+Color c=_g.getColor();
+_g.setColor(Color.cyan);
+//Stroke stroke=_g.getStroke();
+//_g.setStroke(new BasicStroke(20));	
+_g.drawRect(rectangle.x,rectangle.y,rectangle.width,rectangle.height);
+_g.setColor(c);
+//_g.setStroke(stroke);
+}
+}
+//revalidate();
+	   }
+	   */
+//@Override
+public void componentHidden(ComponentEvent event){}
+//@Override
+public void componentShown(ComponentEvent event){}
+//@Override
+public void componentResized(ComponentEvent event){
+	System.out.println("size : "+getWidth()+","+getHeight());
+	hor=ver=0;
+	rotation=0;
+	cropMode=false;
+	//loadImage(path);
+	if(pictureExists(path))
+		loadImage(path);
+	else System.out.println(path+" not found");
 
-	}
-	//@Override
-	public void componentMoved(ComponentEvent event){}
+}
+//@Override
+public void componentMoved(ComponentEvent event){}
 
-	public void changeBrightness(){
-		if(pictureExists(path)){
-			final BufferedImage prev=img;
-			final RescaleOp op=new RescaleOp(brightness,0,null);
-			img=op.filter(img,null);
-		}
-		else System.out.println(path+" not found");
+public void changeBrightness(){
+	if(pictureExists(path)){
+		final BufferedImage prev=img;
+		final RescaleOp op=new RescaleOp(brightness,0,null);
+		img=op.filter(img,null);
 	}
-	/*
-	public void keyPressed(final KeyEvent event){
-		System.out.println("pressed");
-	}
-	public void keyReleased(final KeyEvent event){
-	}
-	public void keyTyped(final KeyEvent event){
-	}
-	*/
-	//@Override
-	public void keyPressed(final KeyEvent event,final LinkedHashSet<Integer>keysPressed){
-		System.out.println("Pressed : "+event.getKeyCode());
-		final int KEY=event.getKeyCode();
-		//keysPressed.add(KEY);
-		//System.out.println(keysPressed);
-		boolean exe=false;
-		if(cropMode){
-			if(KEY==KeyEvent.VK_ENTER){
-				//TODO
-				//save the select region to new bufferedimage
-			}
-			if(KEY==KeyEvent.VK_LEFT){
-				if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-					rectangle.width--;
-				}else{
-					rectangle.x--;
-					rectangle.width++;
-				}
-				exe=true;
-			}
-			if(KEY==KeyEvent.VK_RIGHT){
-				if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-					rectangle.width++;
-				}else{
-					rectangle.x++;
-					rectangle.width--;
-				}
-				exe=true;
-			}
-			if(KEY==KeyEvent.VK_UP){
-				if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-					rectangle.height--;
-				}else{
-					rectangle.y--;
-					rectangle.height++;
-				}
-				exe=true;
-			}
-			if(KEY==KeyEvent.VK_DOWN){
-				if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-					rectangle.height++;
-				}else{
-					rectangle.y++;
-					rectangle.height--;
-				}
-				exe=true;
-			}
-			if(exe){
-				repaint();
-				return;
-			}
-		}
-		if(KEY==KeyEvent.VK_ADD){
-			System.out.println("Add");
-			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-				System.out.println("found");
-				zoomIn();
-				exe=true;
-			}
-		}
-		if(KEY==KeyEvent.VK_SUBTRACT){
-			System.out.println("Minus");
-			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-				System.out.println("found");
-				zoomOut();
-				exe=true;
-			}
+	else System.out.println(path+" not found");
+}
+/*
+   public void keyPressed(final KeyEvent event){
+   System.out.println("pressed");
+   }
+   public void keyReleased(final KeyEvent event){
+   }
+   public void keyTyped(final KeyEvent event){
+   }
+   */
+//@Override
+public void keyPressed(final KeyEvent event,final LinkedHashSet<Integer>keysPressed){
+	System.out.println("Pressed : "+event.getKeyCode());
+	final int KEY=event.getKeyCode();
+	//keysPressed.add(KEY);
+	//System.out.println(keysPressed);
+	boolean exe=false;
+	if(cropMode){
+		if(KEY==KeyEvent.VK_ENTER){
+			//TODO
+			//save the select region to new bufferedimage
 		}
 		if(KEY==KeyEvent.VK_LEFT){
 			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-				System.out.println("rotate left");
-				rotate(-10);
-				exe=true;
-
+				rectangle.width--;
+			}else{
+				rectangle.x--;
+				rectangle.width++;
 			}
+			exe=true;
 		}
 		if(KEY==KeyEvent.VK_RIGHT){
 			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-				System.out.println("rotate right");
-				rotate(10);
-				exe=true;
+				rectangle.width++;
+			}else{
+				rectangle.x++;
+				rectangle.width--;
 			}
+			exe=true;
 		}
 		if(KEY==KeyEvent.VK_UP){
-			if(!exe){
-				moveImage(0,-move);
-				exe=true;
+			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+				rectangle.height--;
+			}else{
+				rectangle.y--;
+				rectangle.height++;
 			}
+			exe=true;
 		}
 		if(KEY==KeyEvent.VK_DOWN){
-			if(!exe){
-				moveImage(0,move);
-				exe=true;
-			}
-		}
-		if(KEY==KeyEvent.VK_LEFT){
-			if(!exe){
-				moveImage(-move,0);
-				exe=true;
-			}
-		}
-		if(KEY==KeyEvent.VK_RIGHT){
-			if(!exe){
-				moveImage(move,0);
-				exe=true;
-			}
-		}
-		if(KEY==KeyEvent.VK_B)
 			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-				brightness+=(brightness_change*(keysPressed.contains(KeyEvent.VK_SHIFT)?-1:1));	
-				loadImage(path);
-				//changeBrightness(brightness_change*(keysPressed.contains(KeyEvent.VK_SHIFT)?-1:1));
-				exe=true;
+				rectangle.height++;
+			}else{
+				rectangle.y++;
+				rectangle.height--;
 			}
-		if(KEY==KeyEvent.VK_C)
-			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-				cropMode=true;
-				final int width=50,height=50;
-				rectangle.width=width;
-				rectangle.height=height;
-				rectangle.x=getWidth()/2-width/2;
-				rectangle.y=getHeight()/2-height/2;
-			}
-		if(KEY==KeyEvent.VK_ESCAPE){
-			if(cropMode){
-				cropMode=false;
-				repaint();
-			}
+			exe=true;
 		}
-		/*if(KEY==KeyEvent.VK_B)
-		  if(keysPressed.contains(KeyEvent.VK_CONTROL) && keysPressed.contains(KeyEvent.VK_SHIFT)){
-		  changeBrightness(-brightness_change);
-		  exe=true;
-		  }
+		if(exe){
+			repaint();
+			return;
+		}
+	}
+	if(KEY==KeyEvent.VK_ADD){
+		System.out.println("Add");
+		if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+			System.out.println("found");
+			zoomIn();
+			exe=true;
+		}
+	}
+	if(KEY==KeyEvent.VK_SUBTRACT){
+		System.out.println("Minus");
+		if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+			System.out.println("found");
+			zoomOut();
+			exe=true;
+		}
+	}
+	if(KEY==KeyEvent.VK_LEFT){
+		if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+			System.out.println("rotate left");
+			rotate(-10);
+			exe=true;
+
+		}
+	}
+	if(KEY==KeyEvent.VK_RIGHT){
+		if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+			System.out.println("rotate right");
+			rotate(10);
+			exe=true;
+		}
+	}
+	if(KEY==KeyEvent.VK_UP){
+		if(!exe){
+			moveImage(0,-move);
+			exe=true;
+		}
+	}
+	if(KEY==KeyEvent.VK_DOWN){
+		if(!exe){
+			moveImage(0,move);
+			exe=true;
+		}
+	}
+	if(KEY==KeyEvent.VK_LEFT){
+		if(!exe){
+			moveImage(-move,0);
+			exe=true;
+		}
+	}
+	if(KEY==KeyEvent.VK_RIGHT){
+		if(!exe){
+			moveImage(move,0);
+			exe=true;
+		}
+	}
+	if(KEY==KeyEvent.VK_B)
+		if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+			brightness+=(brightness_change*(keysPressed.contains(KeyEvent.VK_SHIFT)?-1:1));	
+			loadImage(path);
+			//changeBrightness(brightness_change*(keysPressed.contains(KeyEvent.VK_SHIFT)?-1:1));
+			exe=true;
+		}
+	if(KEY==KeyEvent.VK_C)
+		if(keysPressed.contains(KeyEvent.VK_CONTROL)){
+			cropMode=true;
+			final int width=50,height=50;
+			rectangle.width=width;
+			rectangle.height=height;
+			rectangle.x=getWidth()/2-width/2;
+			rectangle.y=getHeight()/2-height/2;
+		}
+	if(KEY==KeyEvent.VK_ESCAPE){
+		if(cropMode){
+			cropMode=false;
+			repaint();
+		}
+	}
+	/*if(KEY==KeyEvent.VK_B)
+	  if(keysPressed.contains(KeyEvent.VK_CONTROL) && keysPressed.contains(KeyEvent.VK_SHIFT)){
+	  changeBrightness(-brightness_change);
+	  exe=true;
+	  }
+	  */
+}
+
+//@Override
+public void keyTyped(final KeyEvent event,final LinkedHashSet<Integer>keysPressed){}
+//@Override
+public void keyReleased(final KeyEvent event,final LinkedHashSet<Integer>keysPressed){
+	System.out.println("Released : "+event.getKeyCode());
+	final int KEY=event.getKeyCode();
+	//keysPressed.remove(KEY);
+	//System.out.println(keysPressed);
+
+}
+@Override
+public void paintComponent(final Graphics g){
+	System.out.println("paintComponent");
+	super.paintComponent(g);
+	//super.paint(g);
+	if(img!=null){
+		g.clearRect(0,0,getWidth(),getHeight());
+		final int tb=getTitleBarHeight();
+		System.out.println("title bar height : "+tb);
+		/*g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-(img.getHeight()-tb)/2+ver,
+		  Math.min(img.getWidth(),getWidth()),Math.min(img.getHeight(),getHeight()),this);
 		  */
-	}
-
-	//@Override
-	public void keyTyped(final KeyEvent event,final LinkedHashSet<Integer>keysPressed){}
-	//@Override
-	public void keyReleased(final KeyEvent event,final LinkedHashSet<Integer>keysPressed){
-		System.out.println("Released : "+event.getKeyCode());
-		final int KEY=event.getKeyCode();
-		//keysPressed.remove(KEY);
-		//System.out.println(keysPressed);
-
-	}
-	@Override
-	public void paintComponent(final Graphics g){
-		System.out.println("paintComponent");
-		super.paintComponent(g);
-		//super.paint(g);
-		if(img!=null){
-			g.clearRect(0,0,getWidth(),getHeight());
-			final int tb=getTitleBarHeight();
-			System.out.println("title bar height : "+tb);
-			/*g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-(img.getHeight()-tb)/2+ver,
-			  Math.min(img.getWidth(),getWidth()),Math.min(img.getHeight(),getHeight()),this);
-			  */
-			/*g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-img.getHeight()/2+ver,
-			  Math.min(img.getWidth(),getWidth()),Math.min(img.getHeight(),getHeight()),null);
-			  */
-			g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2+tb/2-img.getHeight()/2+ver,
-					img.getWidth(),img.getHeight(),null);
-			//TODO implement cropMode
-			if(cropMode && false){
-				//	Graphics2D _g=(Graphics2D)img.getGraphics();
-				Graphics _g=g;
-				Color c=_g.getColor();
-				_g.setColor(Color.cyan);
-				//Stroke stroke=_g.getStroke();
-				//_g.setStroke(new BasicStroke(20));	
-				_g.drawRect(rectangle.x,rectangle.y,rectangle.width,rectangle.height);
-				_g.setColor(c);
-				//_g.setStroke(stroke);
-			}
+		/*g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2-img.getHeight()/2+ver,
+		  Math.min(img.getWidth(),getWidth()),Math.min(img.getHeight(),getHeight()),null);
+		  */
+		g.drawImage(img,getWidth()/2-img.getWidth()/2+hor,getHeight()/2+tb/2-img.getHeight()/2+ver,
+				img.getWidth(),img.getHeight(),null);
+		//TODO implement cropMode
+		if(cropMode && false){
+			//	Graphics2D _g=(Graphics2D)img.getGraphics();
+			Graphics _g=g;
+			Color c=_g.getColor();
+			_g.setColor(Color.cyan);
+			//Stroke stroke=_g.getStroke();
+			//_g.setStroke(new BasicStroke(20));	
+			_g.drawRect(rectangle.x,rectangle.y,rectangle.width,rectangle.height);
+			_g.setColor(c);
+			//_g.setStroke(stroke);
 		}
-		//revalidate();
 	}
+	//revalidate();
+}
 }
