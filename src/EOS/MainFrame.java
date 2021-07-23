@@ -36,6 +36,7 @@ import java.util.Random;
 import java.awt.AWTException;
 import java.awt.Robot;
 import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.WebcamResolution;
 
 public class MainFrame extends JFrame implements KeyListener,ComponentListener,ActionListener{
 	String path;
@@ -234,12 +235,16 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 	private void captureImage(){
 		try{
 			final Webcam webcam=Webcam.getDefault();
+			for(Dimension size:webcam.getViewSizes())
+				System.out.println("supported size : "+size);
+			webcam.setViewSize(WebcamResolution.VGA.getSize());
 			webcam.open();
 			final BufferedImage image=webcam.getImage();
+			webcam.close();
 			final String str=generateRandomString(20);
 			System.out.println("RandomString generated : "+str);
-			final String path=System.getProperty("user.dir")+"/"+str+".jpg";
-			ImageIO.write(image,"jpg",new File(path));
+			final String path=System.getProperty("user.dir")+"/"+str+".png";
+			ImageIO.write(image,"PNG",new File(path));
 			addToTabbedPane(path);
 		}catch(IOException ioException){
 			ioException.printStackTrace();
