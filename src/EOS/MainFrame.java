@@ -1,3 +1,4 @@
+
 import javax.swing.JFrame;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
@@ -37,6 +38,7 @@ import java.awt.AWTException;
 import java.awt.Robot;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamResolution;
+import imageUtils.ImageUtils;
 
 public class MainFrame extends JFrame implements KeyListener,ComponentListener,ActionListener{
 	String path;
@@ -58,6 +60,7 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 	//private JMenu settings;
 	final private JTabbedPane tabbedPane;
 	private JFileChooser fileChooser;
+	private WebCamFrame webCamFrame;
 	public MainFrame(final String path){
 		this.path=path;
 		this.setTitle("EOS");
@@ -232,7 +235,7 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 		}
 
 	}
-	private void captureImage(){
+	/*private void captureImage(){
 		try{
 			final Webcam webcam=Webcam.getDefault();
 			for(Dimension size:webcam.getViewSizes())
@@ -250,6 +253,24 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 			ioException.printStackTrace();
 			System.out.println("cannot add to the tabbed pane");
 		}
+
+	}*/
+	private void captureImage(){
+		/*final webcam webcam=webcam.getdefault();
+		  for(dimension size:webcam.getviewsizes())
+		  system.out.println("supported size : "+size);
+		  webcam.setviewsize(webcamresolution.vga.getsize());
+		  webcam.open();
+		  final bufferedimage image=webcam.getimage();
+		  webcam.close();
+		  final string str=generaterandomstring(20);
+		  system.out.println("randomstring generated : "+str);
+		  final string path=system.getproperty("user.dir")+"/"+str+".png";
+		  imageio.write(image,"png",new file(path));
+		  addtotabbedpane(path);
+		  */
+		webCamFrame=new WebCamFrame(new Dimension(500,500),this);
+		this.setVisible(false);
 
 	}
 	private void save(){
@@ -323,6 +344,21 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 		return str.toString();
 	}
 
+	public void setCapturedImage(final Image image){
+		try{
+			if(image!=null){
+				final String str=generateRandomString(20);
+				System.out.println("randomstring generated : "+str);
+				final String path=System.getProperty("user.dir")+"/"+str+".png";
+				ImageIO.write(ImageUtils.toBufferedImage(image),"png",new File(path));
+				addToTabbedPane(path);
+				webCamFrame=null;
+			}else System.out.println("please press capture button to capture image");
+		}catch(final Exception exception){
+			exception.printStackTrace();
+		}
+		setVisible(true);
+	}
 	@Override
 	public void componentHidden(ComponentEvent event){}
 	@Override
@@ -514,3 +550,4 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 
 	}
 }
+

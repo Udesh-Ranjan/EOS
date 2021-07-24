@@ -17,30 +17,64 @@ import javax.swing.JPanel;
 import java.awt.FlowLayout;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
+import java.awt.event.WindowListener;
+import java.awt.event.WindowEvent;
 
-public class WebCamFrame extends JFrame implements ActionListener,ComponentListener{
-	JButton capture;
-	JLabel imageHolder;
-	VideoFeed videoFeed;
-	Image image;
+public class WebCamFrame extends JFrame implements ActionListener,WindowListener{
+	private JButton capture;
+	private JLabel imageHolder;
+	private final VideoFeed videoFeed;
+	private Image image;
+	private Thread thread;
+	private MainFrame mainFrame;
 	public WebCamFrame(final Dimension size){
+		//this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(size);
 		init();
 		videoFeed=new VideoFeed(this);
-		videoFeed.start();
-		(new Thread(videoFeed)).start();
-		this.addComponentListener(this);
+		//this.addComponentListener(this);
+		this.addWindowListener(this);
+		start();
 		this.setVisible(true);
 	}
-	public void componentHidden(ComponentEvent event){
+	public WebCamFrame(final Dimension size,final MainFrame mainFrame){
+		//this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.mainFrame=mainFrame;
+		this.setSize(size);
+		init();
+		videoFeed=new VideoFeed(this);
+		//this.addComponentListener(this);
+		this.addWindowListener(this);
+		start();
+		this.setVisible(true);
 	}
-	public void componentShown(ComponentEvent event){
+	public void windowActivated(WindowEvent event){}
+	public void windowClosed(WindowEvent event){
+		System.out.println("WebCamFrame window closed");
+		//stop();
 	}
-	public void componentClosed(ComponentEvent event){
+	public void windowClosing(WindowEvent event){
+		System.out.println("WebCamFrame window closing");
+		stop();
+		this.setVisible(false);
+		this.dispose();
+		if(mainFrame!=null)
+			mainFrame.setCapturedImage(getCapturedImage());
 	}
-	public void componentMoved(ComponentEvent event){
+	public void windowDeactivated(WindowEvent event){}
+	public void windowDeiconified(WindowEvent event){}
+	public void windowIconified(WindowEvent event){}
+	public void windowOpened(WindowEvent event){}
+
+	public void start(){
+		if(!videoFeed.isRunning()){
+			thread=new Thread(videoFeed);
+			videoFeed.start();
+			thread.start();
+		}else System.out.println("error videoFeed instance is already running call stop and then start");
 	}
-	public void componentResized(ComponentEvent event){
+	public void stop(){
+		videoFeed.stop();
 	}
 	private void init(){
 		capture=new JButton("Capture");
@@ -58,11 +92,6 @@ public class WebCamFrame extends JFrame implements ActionListener,ComponentListe
 		this.add(imageHolder,BorderLayout.CENTER);
 		this.add(panel,BorderLayout.SOUTH);
 	}
-	public static void main(String $[]){
-		SwingUtilities.invokeLater(()->{
-			WebCamFrame frame=new WebCamFrame(new Dimension(500,500));
-		});
-	}
 	public void updateImage(final Image image){
 		imageHolder.setIcon(new ImageIcon(image));
 	}
@@ -72,10 +101,13 @@ public class WebCamFrame extends JFrame implements ActionListener,ComponentListe
 			image=videoFeed.getImage();
 		}
 	}
-	public class VideoFeed implements Runnable{
-		private boolean running;
-		WebCamFrame frame;
-		Webcam webcam;;
+	public Image getCapturedImage(){
+		return image;
+	}
+	private class VideoFeed implements Runnable{
+		private volatile boolean running;
+		private WebCamFrame frame;
+		private Webcam webcam;
 		public VideoFeed(WebCamFrame frame){
 			this.frame=frame;
 			running=false;
@@ -85,6 +117,7 @@ public class WebCamFrame extends JFrame implements ActionListener,ComponentListe
 		}
 		public void stop(){
 			running=false;
+			System.out.println("videoFeed running is turned as false");
 		}
 		public boolean isRunning(){
 			return running;
@@ -106,9 +139,18 @@ public class WebCamFrame extends JFrame implements ActionListener,ComponentListe
 				}catch(final InterruptedException exception){
 					exception.printStackTrace();
 				}
+				catch(Exception exc){
+					exc.printStackTrace();
+				}
 			}
 			webcam.close();
+			System.out.println("webcam is closed");
 			running=false;
 		}
+	}
+	public static void main(String $[]){
+		SwingUtilities.invokeLater(()->{
+			WebCamFrame frame=new WebCamFrame(new Dimension(500,500));
+		});
 	}
 }
