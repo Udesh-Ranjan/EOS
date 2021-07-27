@@ -27,6 +27,7 @@ import javax.swing.JMenuItem;
 import java.awt.Dimension;
 import javax.swing.JPanel;
 import imageUtils.ImageUtils;
+import java.awt.AlphaComposite;
 
 public class EOSPanel extends JPanel {
 	public BufferedImage img;
@@ -42,10 +43,12 @@ public class EOSPanel extends JPanel {
 	double rotation;
 	int hor,ver;
 	float brightness;
+	float opacity;
 	public boolean cropMode;
 	public Rectangle rectangle;
 
 	private final MainFrame mainFrame;
+	private final float opacity_change=0.1f;
 	//private JMenu settings;
 	//TODO move stuffs to JPanel's child class
 	public EOSPanel(final String path,final Dimension size,final MainFrame mainFrame){
@@ -63,6 +66,7 @@ public class EOSPanel extends JPanel {
 		hor=ver=0;
 		brightness=1.0f;
 		rectangle=new Rectangle(0,0,0,0);
+		opacity=1f;
 		if(pictureExists(path))
 			loadImage(path);
 		else System.out.println(path+"Picture not found");
@@ -233,11 +237,12 @@ public class EOSPanel extends JPanel {
 				stream.close();
 				_img.flush();
 				final BufferedImage scaledImg=new BufferedImage(new_width,new_height,BufferedImage.TYPE_4BYTE_ABGR);
-				scaledImg.getGraphics().drawImage(image,0,0,this);
+				final Graphics2D g=(Graphics2D)scaledImg.createGraphics();
+				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,(float) opacity));
+				g.drawImage(image,0,0,this);
 				img=ImageUtils.rotateImageByDegrees(scaledImg,rotation);
 				changeBrightness();
-				scaledImg.getGraphics().dispose();
-				scaledImg.flush();
+				g.dispose();
 				//image.getGraphics().dispose();
 				System.out.println("new size : "+new_width+","+new_height);
 				//image.dispose();TODO
@@ -260,6 +265,13 @@ public class EOSPanel extends JPanel {
 		System.out.println("zoomOut");
 		zoom=zoom/incr;
 		//loadImageMaintainAspectRatioAndZoom(path);
+		if(pictureExists(path))
+			loadImage(path);
+		else System.out.println(path+" not found");
+	}
+	public void resetZoom(){
+		System.out.println("resetZoom");
+		zoom=1;
 		if(pictureExists(path))
 			loadImage(path);
 		else System.out.println(path+" not found");
@@ -344,6 +356,20 @@ public class EOSPanel extends JPanel {
 		hor=ver=0;
 		moveImage(0,0);
 	}
+	public void increaseOpacity(){
+		opacity+=opacity_change;
+		opacity=Math.min(1.0f,opacity);
+		loadImage(path);
+	}
+	public void decreaseOpacity(){
+		opacity-=opacity_change;
+		opacity=Math.max(0.0f,opacity);
+		loadImage(path);
+	}
+	public void resetOpacity(){
+		opacity=1.0f;
+		loadImage(path);
+	}
 	//@Override
 	public void keyPressed(final KeyEvent event,final LinkedHashSet<Integer>keysPressed){
 		System.out.println("Pressed : "+event.getKeyCode());
@@ -400,17 +426,17 @@ public class EOSPanel extends JPanel {
 		if(KEY==KeyEvent.VK_ADD){
 			System.out.println("Add");
 			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-				System.out.println("found");
-				zoomIn();
-				exe=true;
+				//				System.out.println("found");
+				//				zoomIn();
+				//				exe=true;
 			}
 		}
 		if(KEY==KeyEvent.VK_SUBTRACT){
 			System.out.println("Minus");
 			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-				System.out.println("found");
-				zoomOut();
-				exe=true;
+				//System.out.println("found");
+				//zoomOut();
+				//exe=true;
 			}
 		}
 		if(KEY==KeyEvent.VK_LEFT){

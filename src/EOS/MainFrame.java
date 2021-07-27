@@ -62,6 +62,9 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 	private JMenu zoomMenu;
 	private JMenuItem zoomInMenuItem,zoomOutMenuItem,resetZoomMenuItem;
 
+	private JMenu opacityMenu;
+	private JMenuItem increaseOpacityMenuItem,decreaseOpacityMenuItem,resetOpacityMenuItem;
+
 	private JMenu toolsMenu;
 	private JMenuItem cameraMenuItem;
 	private JMenuItem screenShotMenuItem;
@@ -163,6 +166,7 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 		initializeRotateMenu();
 		initializeShiftMenu();
 		initializeZoomMenu();
+		initializeOpacityMenu();
 		menuBar.add(editMenu);
 	}
 	private void initializeBrightnessMenu(){
@@ -249,9 +253,11 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 
 		zoomInMenuItem=new JMenuItem("Zoom In");
 		zoomInMenuItem.addActionListener(this);
+		zoomInMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ADD,InputEvent.CTRL_DOWN_MASK));
 
 		zoomOutMenuItem=new JMenuItem("Zoom Out");
 		zoomOutMenuItem.addActionListener(this);
+		zoomOutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT,InputEvent.CTRL_DOWN_MASK));
 
 		resetZoomMenuItem=new JMenuItem("Reset Zoom");
 		resetZoomMenuItem.addActionListener(this);
@@ -261,6 +267,27 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 		zoomMenu.add(resetZoomMenuItem);
 
 		editMenu.add(zoomMenu);
+	}
+	private void initializeOpacityMenu(){
+		opacityMenu=new JMenu("Opacity");
+
+		increaseOpacityMenuItem=new JMenuItem("Increase Opacity");
+		increaseOpacityMenuItem.addActionListener(this);
+		increaseOpacityMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,InputEvent.CTRL_DOWN_MASK+InputEvent.ALT_DOWN_MASK));
+
+		decreaseOpacityMenuItem=new JMenuItem("Decrease Opacity");
+		decreaseOpacityMenuItem.addActionListener(this);
+		decreaseOpacityMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,InputEvent.CTRL_DOWN_MASK+InputEvent.SHIFT_DOWN_MASK));
+
+		resetOpacityMenuItem=new JMenuItem("Reset Opacity");
+		resetOpacityMenuItem.addActionListener(this);
+		//resetOpacityMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,InputEvent.CTRL_DOWN_MENU));
+
+		opacityMenu.add(increaseOpacityMenuItem);
+		opacityMenu.add(decreaseOpacityMenuItem);
+		opacityMenu.add(resetOpacityMenuItem);
+
+		editMenu.add(opacityMenu);
 	}
 	private void initializeToolsMenu(){
 		toolsMenu=new JMenu("Tools");
@@ -428,6 +455,48 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 			EOSPanel EOSPanel=(EOSPanel)tabbedPane.getSelectedComponent();
 			if(eosPanel!=null){
 				eosPanel.resetShift();
+			}
+		}
+		if(event.getSource()==zoomInMenuItem){
+			System.out.println("Zoom In");
+			EOSPanel eosPanel=(EOSPanel)tabbedPane.getSelectedComponent();
+			if(eosPanel!=null){
+				eosPanel.zoomIn();
+			}
+		}
+		if(event.getSource()==zoomOutMenuItem){
+			System.out.println("Zoom Out");
+			EOSPanel eosPanel=(EOSPanel)tabbedPane.getSelectedComponent();
+			if(eosPanel!=null){
+				eosPanel.zoomOut();
+			}
+		}
+		if(event.getSource()==resetZoomMenuItem){
+			System.out.println("Reset zoom");
+			EOSPanel eosPanel=(EOSPanel)tabbedPane.getSelectedComponent();
+			if(eosPanel!=null){
+				eosPanel.resetZoom();
+			}
+		}
+		if(event.getSource()==increaseOpacityMenuItem){
+			System.out.println("Increase Opacity");
+			EOSPanel eosPanel=(EOSPanel)tabbedPane.getSelectedComponent();
+			if(eosPanel!=null){
+				eosPanel.increaseOpacity();
+			}
+		}
+		if(event.getSource()==decreaseOpacityMenuItem){
+			System.out.println("Decrease Opacity");
+			EOSPanel eosPanel=(EOSPanel)tabbedPane.getSelectedComponent();
+			if(eosPanel!=null){
+				eosPanel.decreaseOpacity();
+			}
+		}
+		if(event.getSource()==resetOpacityMenuItem){
+			System.out.println("Reset Opacity");
+			EOSPanel eosPanel=(EOSPanel)tabbedPane.getSelectedComponent();
+			if(eosPanel!=null){
+				eosPanel.resetOpacity();
 			}
 		}
 
