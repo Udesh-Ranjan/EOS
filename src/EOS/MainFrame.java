@@ -47,11 +47,20 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
 	private JMenuItem newMenuItem,openMenuItem,saveMenuItem,saveAsMenuItem,exitMenuItem;
+
 	private JMenu editMenu;
-	private JMenuItem brightnessMenuItem,increaseBrightnessMenuItem,decreaseBrightnessMenuItem;
-	private JMenuItem rotateMenuItem,rotateLeftMenuItem,rotateRightMenuItem;
-	private JMenuItem shiftMenuItem,shiftLeftMenuItem,shiftRightMenuItem,shiftUpMenuItem,shiftDownMenuItem;
-	private JMenuItem zoomMenuItem,zoomInMenuItem,zoomOutMenuItem;
+
+	private JMenu brightnessMenu;
+	private JMenuItem increaseBrightnessMenuItem,decreaseBrightnessMenuItem,resetBrightnessMenuItem;
+
+	private JMenu rotateMenu;
+	private JMenuItem rotateLeftMenuItem,rotateRightMenuItem,resetRotateMenuItem;
+
+	private JMenu shiftMenu;
+	private JMenuItem shiftLeftMenuItem,shiftRightMenuItem,shiftUpMenuItem,shiftDownMenuItem,resetShiftMenuItem;
+
+	private JMenu zoomMenu;
+	private JMenuItem zoomInMenuItem,zoomOutMenuItem,resetZoomMenuItem;
 
 	private JMenu toolsMenu;
 	private JMenuItem cameraMenuItem;
@@ -103,6 +112,7 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 	private void initializeMenuBar(){
 		menuBar=new JMenuBar();
 		initializeFileMenu();
+		initializeEditMenu();
 		initializeToolsMenu();
 		this.setJMenuBar(menuBar);
 		//menuBar.setVisible(true);
@@ -136,11 +146,115 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 		fileMenu.add(openMenuItem);
 		fileMenu.add(saveMenuItem);
 		fileMenu.add(saveAsMenuItem);
+		fileMenu.addSeparator();
 		fileMenu.add(exitMenuItem);
 		//fileMenu.setPreferredSize(new Dimension(100,50));
 		menuBar.add(fileMenu);
 	}
 	private void initializeEditMenu(){
+		/*private JMenu editMenu;
+		  private JMenuItem brightnessMenuItem,increaseBrightnessMenuItem,decreaseBrightnessMenuItem,resetBrightnessMenuItem;
+		  private JMenuItem rotateMenuItem,rotateLeftMenuItem,rotateRightMenuItem,resetRotateMenuItem;
+		  private JMenuItem shiftMenuItem,shiftLeftMenuItem,shiftRightMenuItem,shiftUpMenuItem,shiftDownMenuItem,resetShiftMenuItem;
+		  private JMenuItem zoomMenuItem,zoomInMenuItem,zoomOutMenuItem,resetZoomMenuItem;*/
+		editMenu=new JMenu("Edit");
+		editMenu.setMnemonic(KeyEvent.VK_E);
+		initializeBrightnessMenu();
+		initializeRotateMenu();
+		initializeShiftMenu();
+		initializeZoomMenu();
+		menuBar.add(editMenu);
+	}
+	private void initializeBrightnessMenu(){
+		brightnessMenu=new JMenu("Brightness");
+
+		increaseBrightnessMenuItem=new JMenuItem("Increase Brightness");
+		increaseBrightnessMenuItem.addActionListener(this);
+		//saveAsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A,InputEvent.CTRL_DOWN_MASK+InputEvent.SHIFT_DOWN_MASK));
+		increaseBrightnessMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B,InputEvent.CTRL_DOWN_MASK));
+
+		decreaseBrightnessMenuItem=new JMenuItem("Decrease Brightness");
+		decreaseBrightnessMenuItem.addActionListener(this);
+		decreaseBrightnessMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B,InputEvent.CTRL_DOWN_MASK+InputEvent.SHIFT_DOWN_MASK));
+
+		resetBrightnessMenuItem=new JMenuItem("Reset Brightness");
+		resetBrightnessMenuItem.addActionListener(this);
+		//resetBrightnessMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R+KeyEvent.VK_B,InputEvent.CTRL_DOWN_MASK));
+
+		brightnessMenu.add(increaseBrightnessMenuItem);
+		brightnessMenu.add(decreaseBrightnessMenuItem);
+		brightnessMenu.add(resetBrightnessMenuItem);
+
+		editMenu.add(brightnessMenu);
+	}
+	private void initializeRotateMenu(){
+
+		/*private JMenu rotateMenu;
+		  private JMenuItem rotateLeftMenuItem,rotateRightMenuItem,resetRotateMenuItem;*/
+		rotateMenu=new JMenu("Rotate");
+		rotateLeftMenuItem=new JMenuItem("rotateLeftMenuItem");
+		rotateLeftMenuItem.addActionListener(this);
+
+		rotateRightMenuItem=new JMenuItem("Rotate Right");
+		rotateRightMenuItem.addActionListener(this);
+
+		resetRotateMenuItem=new JMenuItem("Reset Rotation");
+		resetRotateMenuItem.addActionListener(this);
+
+		rotateMenu.add(rotateLeftMenuItem);
+		rotateMenu.add(rotateRightMenuItem);
+		rotateMenu.add(resetRotateMenuItem);
+
+		editMenu.add(rotateMenu);
+	}
+	private void initializeShiftMenu(){
+		//		private JMenu shiftMenu;
+		//		private JMenuItem shiftLeftMenuItem,shiftRightMenuItem,shiftUpMenuItem,shiftDownMenuItem,resetShiftMenuItem;
+		shiftMenu=new JMenu("Shift Image");
+
+		shiftLeftMenuItem=new JMenuItem("Sift Left");
+		shiftLeftMenuItem.addActionListener(this);
+
+		shiftRightMenuItem=new JMenuItem("Shift Right");
+		shiftRightMenuItem.addActionListener(this);
+
+		shiftUpMenuItem=new JMenuItem("Shift Up");
+		shiftUpMenuItem.addActionListener(this);
+
+		shiftDownMenuItem=new JMenuItem("Shift Down");
+		shiftDownMenuItem.addActionListener(this);
+
+		resetShiftMenuItem=new JMenuItem("Reset Shift");
+		resetShiftMenuItem.addActionListener(this);
+
+		shiftMenu.add(shiftLeftMenuItem);
+		shiftMenu.add(shiftRightMenuItem);
+		shiftMenu.add(shiftUpMenuItem);
+		shiftMenu.add(shiftDownMenuItem);
+		shiftMenu.add(resetShiftMenuItem);
+
+		editMenu.add(shiftMenu);
+	}
+	private void initializeZoomMenu(){
+
+		//		private JMenu zoomMenu;
+		//		private JMenuItem zoomInMenuItem,zoomOutMenuItem,resetZoomMenuItem;
+		zoomMenu=new JMenu("Zoom Image");
+
+		zoomInMenuItem=new JMenuItem("Zoom In");
+		zoomInMenuItem.addActionListener(this);
+
+		zoomOutMenuItem=new JMenuItem("Zoom Out");
+		zoomOutMenuItem.addActionListener(this);
+
+		resetZoomMenuItem=new JMenuItem("Reset Zoom");
+		resetZoomMenuItem.addActionListener(this);
+
+		zoomMenu.add(zoomInMenuItem);
+		zoomMenu.add(zoomOutMenuItem);
+		zoomMenu.add(resetZoomMenuItem);
+
+		editMenu.add(zoomMenu);
 	}
 	private void initializeToolsMenu(){
 		toolsMenu=new JMenu("Tools");
@@ -233,28 +347,37 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 			System.out.println("WebCam");
 			captureImage();
 		}
+		if(event.getSource()==increaseBrightnessMenuItem){
+			System.out.println("Increase Brightness");
+		}
+		if(event.getSource()==decreaseBrightnessMenuItem){
+			System.out.println("Decrease Brightness");
+		}
+		if(event.getSource()==resetBrightnessMenuItem){
+			System.out.println("ResetBrightness");
+		}
 
 	}
 	/*private void captureImage(){
-		try{
-			final Webcam webcam=Webcam.getDefault();
-			for(Dimension size:webcam.getViewSizes())
-				System.out.println("supported size : "+size);
-			webcam.setViewSize(WebcamResolution.VGA.getSize());
-			webcam.open();
-			final BufferedImage image=webcam.getImage();
-			webcam.close();
-			final String str=generateRandomString(20);
-			System.out.println("RandomString generated : "+str);
-			final String path=System.getProperty("user.dir")+"/"+str+".png";
-			ImageIO.write(image,"PNG",new File(path));
-			addToTabbedPane(path);
-		}catch(IOException ioException){
-			ioException.printStackTrace();
-			System.out.println("cannot add to the tabbed pane");
-		}
+	  try{
+	  final Webcam webcam=Webcam.getDefault();
+	  for(Dimension size:webcam.getViewSizes())
+	  System.out.println("supported size : "+size);
+	  webcam.setViewSize(WebcamResolution.VGA.getSize());
+	  webcam.open();
+	  final BufferedImage image=webcam.getImage();
+	  webcam.close();
+	  final String str=generateRandomString(20);
+	  System.out.println("RandomString generated : "+str);
+	  final String path=System.getProperty("user.dir")+"/"+str+".png";
+	  ImageIO.write(image,"PNG",new File(path));
+	  addToTabbedPane(path);
+	  }catch(IOException ioException){
+	  ioException.printStackTrace();
+	  System.out.println("cannot add to the tabbed pane");
+	  }
 
-	}*/
+	  }*/
 	private void captureImage(){
 		/*final webcam webcam=webcam.getdefault();
 		  for(dimension size:webcam.getviewsizes())
@@ -390,6 +513,8 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 		keysPressed.add(KEY);
 		final EOSPanel eosPanel=(EOSPanel)tabbedPane.getSelectedComponent();
 		if(eosPanel!=null){
+			if(true)
+				return;//TODO REMOVE THIS
 			eosPanel.keyPressed(event,keysPressed);
 		}
 		/*System.out.println("Pressed : "+event.getKeyCode());
