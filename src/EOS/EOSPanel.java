@@ -304,6 +304,46 @@ public class EOSPanel extends JPanel {
 		}
 		else System.out.println(path+" not found");
 	}
+	public void increaseBrightness(){
+		brightness+=brightness_change;
+		loadImage(path);
+
+	}
+	public void decreaseBrightness(){
+		brightness-=brightness_change;
+		loadImage(path);
+
+	}
+	public void resetBrightness(){
+		brightness=1.0f;
+		loadImage(path);
+	}
+	public void rotateRight(){
+		rotate(10);
+	}
+	public void rotateLeft(){
+		rotate(-10);
+	}
+	public void resetRotation(){
+		rotation=0;
+		rotate(0);
+	}
+	public void shiftImageUp(){
+		moveImage(0,-move);
+	}
+	public void shiftImageDown(){
+		moveImage(0,move);
+	}
+	public void shiftImageLeft(){
+		moveImage(-move,0);
+	}
+	public void shiftImageRight(){
+		moveImage(move,0);
+	}
+	public void resetShift(){
+		hor=ver=0;
+		moveImage(0,0);
+	}
 	//@Override
 	public void keyPressed(final KeyEvent event,final LinkedHashSet<Integer>keysPressed){
 		System.out.println("Pressed : "+event.getKeyCode());
@@ -375,47 +415,47 @@ public class EOSPanel extends JPanel {
 		}
 		if(KEY==KeyEvent.VK_LEFT){
 			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-				System.out.println("rotate left");
-				rotate(-10);
-				exe=true;
+				//				System.out.println("rotate left");
+				//				rotate(-10);
+				//				exe=true;
 
 			}
 		}
 		if(KEY==KeyEvent.VK_RIGHT){
 			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-				System.out.println("rotate right");
-				rotate(10);
-				exe=true;
+				//				System.out.println("rotate right");
+				//				rotate(10);
+				//				exe=true;
 			}
 		}
 		if(KEY==KeyEvent.VK_UP){
 			if(!exe){
-				moveImage(0,-move);
-				exe=true;
+				//moveImage(0,-move);
+				//exe=true;
 			}
 		}
 		if(KEY==KeyEvent.VK_DOWN){
 			if(!exe){
-				moveImage(0,move);
-				exe=true;
+				//moveImage(0,move);
+				//exe=true;
 			}
 		}
 		if(KEY==KeyEvent.VK_LEFT){
 			if(!exe){
-				moveImage(-move,0);
+				//moveImage(-move,0);
 				exe=true;
 			}
 		}
 		if(KEY==KeyEvent.VK_RIGHT){
 			if(!exe){
-				moveImage(move,0);
+				//moveImage(move,0);
 				exe=true;
 			}
 		}
 		if(KEY==KeyEvent.VK_B)
 			if(keysPressed.contains(KeyEvent.VK_CONTROL)){
-				brightness+=(brightness_change*(keysPressed.contains(KeyEvent.VK_SHIFT)?-1:1));	
-				loadImage(path);
+				//brightness+=(brightness_change*(keysPressed.contains(KeyEvent.VK_SHIFT)?-1:1));	
+				//loadImage(path);
 				//changeBrightness(brightness_change*(keysPressed.contains(KeyEvent.VK_SHIFT)?-1:1));
 				exe=true;
 			}

@@ -170,7 +170,6 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 
 		increaseBrightnessMenuItem=new JMenuItem("Increase Brightness");
 		increaseBrightnessMenuItem.addActionListener(this);
-		//saveAsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A,InputEvent.CTRL_DOWN_MASK+InputEvent.SHIFT_DOWN_MASK));
 		increaseBrightnessMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B,InputEvent.CTRL_DOWN_MASK));
 
 		decreaseBrightnessMenuItem=new JMenuItem("Decrease Brightness");
@@ -192,11 +191,13 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 		/*private JMenu rotateMenu;
 		  private JMenuItem rotateLeftMenuItem,rotateRightMenuItem,resetRotateMenuItem;*/
 		rotateMenu=new JMenu("Rotate");
-		rotateLeftMenuItem=new JMenuItem("rotateLeftMenuItem");
+		rotateLeftMenuItem=new JMenuItem("Rotate Left");
 		rotateLeftMenuItem.addActionListener(this);
+		rotateLeftMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT,InputEvent.CTRL_DOWN_MASK));
 
 		rotateRightMenuItem=new JMenuItem("Rotate Right");
 		rotateRightMenuItem.addActionListener(this);
+		rotateRightMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT,InputEvent.CTRL_DOWN_MASK));
 
 		resetRotateMenuItem=new JMenuItem("Reset Rotation");
 		resetRotateMenuItem.addActionListener(this);
@@ -214,15 +215,19 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 
 		shiftLeftMenuItem=new JMenuItem("Sift Left");
 		shiftLeftMenuItem.addActionListener(this);
+		shiftLeftMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT,InputEvent.SHIFT_DOWN_MASK));
 
 		shiftRightMenuItem=new JMenuItem("Shift Right");
 		shiftRightMenuItem.addActionListener(this);
+		shiftRightMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT,InputEvent.SHIFT_DOWN_MASK));
 
 		shiftUpMenuItem=new JMenuItem("Shift Up");
 		shiftUpMenuItem.addActionListener(this);
+		shiftUpMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP,InputEvent.SHIFT_DOWN_MASK));
 
 		shiftDownMenuItem=new JMenuItem("Shift Down");
 		shiftDownMenuItem.addActionListener(this);
+		shiftDownMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,InputEvent.SHIFT_DOWN_MASK));
 
 		resetShiftMenuItem=new JMenuItem("Reset Shift");
 		resetShiftMenuItem.addActionListener(this);
@@ -235,6 +240,7 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 
 		editMenu.add(shiftMenu);
 	}
+	//TODO setAccelerator
 	private void initializeZoomMenu(){
 
 		//		private JMenu zoomMenu;
@@ -349,12 +355,80 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 		}
 		if(event.getSource()==increaseBrightnessMenuItem){
 			System.out.println("Increase Brightness");
+			EOSPanel eosPanel=(EOSPanel)tabbedPane.getSelectedComponent();
+			if(eosPanel!=null){
+				eosPanel.increaseBrightness();
+			}
 		}
 		if(event.getSource()==decreaseBrightnessMenuItem){
 			System.out.println("Decrease Brightness");
+			EOSPanel eosPanel=(EOSPanel)tabbedPane.getSelectedComponent();
+			if(eosPanel!=null){
+				eosPanel.decreaseBrightness();
+			}
 		}
 		if(event.getSource()==resetBrightnessMenuItem){
 			System.out.println("ResetBrightness");
+			EOSPanel eosPanel=(EOSPanel)tabbedPane.getSelectedComponent();
+			if(eosPanel!=null){
+				eosPanel.resetBrightness();
+			}
+		}
+		if(event.getSource()==rotateLeftMenuItem){
+			System.out.println("Rotate Left");
+			EOSPanel eosPanel=(EOSPanel)tabbedPane.getSelectedComponent();
+			if(eosPanel!=null){
+				eosPanel.rotateLeft();
+			}
+		}
+		if(event.getSource()==rotateRightMenuItem){
+			System.out.println("Rotate Right");
+			EOSPanel eosPanel=(EOSPanel)tabbedPane.getSelectedComponent();
+			if(eosPanel!=null){
+				eosPanel.rotateRight();
+			}
+		}
+		if(event.getSource()==resetRotateMenuItem){
+			System.out.println("Reset Rotate");
+			EOSPanel EOSPanel=(EOSPanel)tabbedPane.getSelectedComponent();
+			if(eosPanel!=null){
+				eosPanel.resetRotation();
+			}
+		}
+		if(event.getSource()==shiftLeftMenuItem){
+			System.out.println("Shift Left");
+			EOSPanel EOSPanel=(EOSPanel)tabbedPane.getSelectedComponent();
+			if(eosPanel!=null){
+				eosPanel.shiftImageLeft();
+			}
+		}
+		if(event.getSource()==shiftRightMenuItem){
+			System.out.println("Shift Right");
+			EOSPanel EOSPanel=(EOSPanel)tabbedPane.getSelectedComponent();
+			if(eosPanel!=null){
+				eosPanel.shiftImageRight();
+			}
+		}
+		if(event.getSource()==shiftUpMenuItem){
+			System.out.println("Shift UP");
+			EOSPanel EOSPanel=(EOSPanel)tabbedPane.getSelectedComponent();
+			if(eosPanel!=null){
+				eosPanel.shiftImageUp();
+			}
+		}
+		if(event.getSource()==shiftDownMenuItem){
+			System.out.println("Shift Down");
+			EOSPanel EOSPanel=(EOSPanel)tabbedPane.getSelectedComponent();
+			if(eosPanel!=null){
+				eosPanel.shiftImageDown();
+			}
+		}
+		if(event.getSource()==resetShiftMenuItem){
+			System.out.println("Reset Shift");
+			EOSPanel EOSPanel=(EOSPanel)tabbedPane.getSelectedComponent();
+			if(eosPanel!=null){
+				eosPanel.resetShift();
+			}
 		}
 
 	}
