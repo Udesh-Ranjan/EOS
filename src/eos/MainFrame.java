@@ -1,3 +1,4 @@
+package eos;
 
 import javax.swing.JFrame;
 import java.awt.image.BufferedImage;
@@ -38,7 +39,10 @@ import java.awt.AWTException;
 import java.awt.Robot;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamResolution;
-import imageUtils.ImageUtils;
+import java.awt.BorderLayout;
+
+import eos.imageUtils.ImageUtils;
+import eos.toolbar.ToolBar;
 
 public class MainFrame extends JFrame implements KeyListener,ComponentListener,ActionListener{
 	String path;
@@ -73,13 +77,17 @@ public class MainFrame extends JFrame implements KeyListener,ComponentListener,A
 	final private JTabbedPane tabbedPane;
 	private JFileChooser fileChooser;
 	private WebCamFrame webCamFrame;
+	final private ToolBar toolBar;
 	public MainFrame(final String path){
 		this.path=path;
 		this.setTitle("EOS");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		keysPressed=new LinkedHashSet<>();
 		tabbedPane=new JTabbedPane();
-		add(tabbedPane);
+		this.setLayout(new BorderLayout());
+		toolBar=new ToolBar();
+		add(tabbedPane,BorderLayout.CENTER);
+		add(toolBar,BorderLayout.NORTH);
 		this.setSize(500,500);
 		initializeMenuBar();
 

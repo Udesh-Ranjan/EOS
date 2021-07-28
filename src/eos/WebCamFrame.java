@@ -1,3 +1,5 @@
+package eos;
+
 import  javax.swing.JButton;
 import javax.swing.JFrame;
 import java.awt.event.ActionListener;
@@ -19,6 +21,8 @@ import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowListener;
 import java.awt.event.WindowEvent;
+
+import eos.roundBorder.RoundedBorder;
 
 public class WebCamFrame extends JFrame implements ActionListener,WindowListener{
 	private JButton capture;
@@ -79,7 +83,7 @@ public class WebCamFrame extends JFrame implements ActionListener,WindowListener
 	private void init(){
 		capture=new JButton("Capture");
 		//capture.setPreferredSize(new Dimension(30,25));
-		capture.setBorder(new roundBorder.RoundedBorder(25));
+		capture.setBorder(new RoundedBorder(25));
 		capture.setForeground(Color.black);
 		//capture.setBackground(Color.RED);
 		JPanel panel=new JPanel();

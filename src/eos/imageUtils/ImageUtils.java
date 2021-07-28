@@ -1,4 +1,4 @@
-package imageUtils;
+package eos.imageUtils;
 
 import java.awt.image.BufferedImage;
 import java.awt.Image;

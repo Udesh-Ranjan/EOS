@@ -1,3 +1,7 @@
+package eos;
+
+import eos.MainFrame;
+
 public class MainClass{
 	public static void main(String $[])throws Exception{
 		System.out.println("main");

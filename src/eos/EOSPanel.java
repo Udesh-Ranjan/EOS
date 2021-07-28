@@ -1,3 +1,5 @@
+package eos;
+
 import javax.swing.JFrame;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
@@ -26,8 +28,10 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import java.awt.Dimension;
 import javax.swing.JPanel;
-import imageUtils.ImageUtils;
 import java.awt.AlphaComposite;
+
+import eos.MainFrame;
+import eos.imageUtils.ImageUtils;
 
 public class EOSPanel extends JPanel {
 	public BufferedImage img;

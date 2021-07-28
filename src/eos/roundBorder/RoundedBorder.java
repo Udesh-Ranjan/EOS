@@ -1,4 +1,4 @@
-package roundBorder;
+package eos.roundBorder;
 
 import javax.swing.border.Border;
 import java.awt.Component;
