@@ -10,6 +10,10 @@ import javax.swing.JButton;
 import javax.swing.ImageIcon;
 
 import java.net.URL;
+import java.net.MalformedURLException;
+import java.io.File;
+import java.io.InputStream;
+import java.io.IOException;
 
 public class Shapes extends JPanel implements ActionListener{
 	private JButton circle,rectangle,roundedRect;
@@ -18,22 +22,39 @@ public class Shapes extends JPanel implements ActionListener{
 	}
 	private void initButtons(){
 		System.out.println("InitButtons");
-		circle=makeButton("","Circle","Clircle");
+		System.out.println("present working dir : "+System.getProperty("user.dir"));
+		circle=makeButton("icons/circle.png","Circle","Clircle");
 		add(circle);
-		rectangle=makeButton("","Rectangle","Rectangle");
+		rectangle=makeButton("icons/rectangle.png","Rectangle","Rectangle");
 		add(rectangle);
-		roundedRect=makeButton("","Rounded Rectangle","Rounded Rectangle");
+		roundedRect=makeButton("icons/rounded-rectangle.png","Rounded Rectangle","Rounded Rectangle");
 		add(roundedRect);
 	}
 	private JButton makeButton(final String imageLocation,
 			final String toolTipText,final String altText){
-		final URL imageURL=Shapes.class.getResource(imageLocation);
+		File file=new File(imageLocation);
+		URL imageURL=null;
+		//	try{
+				imageURL=eos.MainClass.class.getResource(imageLocation);
+		//}catch(MalformedURLException exception){
+		//		exception.printStackTrace();
+		//	}
+		
+	//	InputStream in=getClass().getResourceAsStream(imageLocation);
+		//if(in==null){
+	//		System.out.println("path not found : "+imageLocation);
+	//	}
 		final JButton button=new JButton();
 		button.setToolTipText(toolTipText);
 		button.addActionListener(this);
-		button.setPreferredSize(new Dimension(30,30));
-		if(imageURL!=null)
-			button.setIcon(new ImageIcon(imageURL,altText));
+		button.setPreferredSize(new Dimension(100,100));
+		if(imageURL!=null){
+			//try{
+				button.setIcon(new ImageIcon(imageURL,altText));
+			//}catch(IOException exception){
+		//		exception.printStackTrace();
+				//button.setText(altText);
+			}
 		else {
 			button.setText(altText);
 			System.err.println("Resource not found : "+imageLocation);
