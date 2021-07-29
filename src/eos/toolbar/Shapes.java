@@ -16,51 +16,52 @@ import java.io.InputStream;
 import java.io.IOException;
 
 public class Shapes extends JPanel implements ActionListener{
-	private JButton circle,rectangle,roundedRect;
+	private ToolButton circle,rectangle,roundedRect;
 	public Shapes(){
 		initButtons();
 	}
 	private void initButtons(){
 		System.out.println("InitButtons");
+		String dir="/home/dev/Documents/javaPro/EOS/out/eos/";
 		System.out.println("present working dir : "+System.getProperty("user.dir"));
-		circle=makeButton("icons/circle.png","Circle","Clircle");
+		circle=makeButton(dir+"icons/circle.png","Circle","Clircle");
 		add(circle);
-		rectangle=makeButton("icons/rectangle.png","Rectangle","Rectangle");
+		rectangle=makeButton(dir+"icons/rectangle.png","Rectangle","Rectangle");
 		add(rectangle);
-		roundedRect=makeButton("icons/rounded-rectangle.png","Rounded Rectangle","Rounded Rectangle");
+		roundedRect=makeButton(dir+"icons/rounded-rectangle.png","Rounded Rectangle","Rounded Rectangle");
 		add(roundedRect);
 	}
-	private JButton makeButton(final String imageLocation,
+	private ToolButton makeButton(final String imageLocation,
 			final String toolTipText,final String altText){
-		File file=new File(imageLocation);
-		URL imageURL=null;
+		//File file=new File(imageLocation);
+		//URL imageURL=null;
 		//	try{
-				imageURL=eos.MainClass.class.getResource(imageLocation);
+		//	imageURL=eos.MainClass.class.getResource(imageLocation);
 		//}catch(MalformedURLException exception){
 		//		exception.printStackTrace();
 		//	}
-		
-	//	InputStream in=getClass().getResourceAsStream(imageLocation);
+
+		//	InputStream in=getClass().getResourceAsStream(imageLocation);
 		//if(in==null){
-	//		System.out.println("path not found : "+imageLocation);
-	//	}
-		final JButton button=new JButton();
-		button.setToolTipText(toolTipText);
-		button.addActionListener(this);
-		button.setPreferredSize(new Dimension(100,100));
-		if(imageURL!=null){
-			//try{
-				button.setIcon(new ImageIcon(imageURL,altText));
-			//}catch(IOException exception){
+		//		System.out.println("path not found : "+imageLocation);
+		//	}
+		final ToolButton button=new ToolButton(imageLocation,altText,new Dimension(20,20),toolTipText,this);
+		//button.setToolTipText(toolTipText);
+		//button.addActionListener(this);
+		//button.setPreferredSize(new Dimension(100,100));
+		//if(imageURL!=null){
+		//try{
+		//		button.setIcon(new ImageIcon(imageURL,altText));
+		//}catch(IOException exception){
 		//		exception.printStackTrace();
-				//button.setText(altText);
-			}
-		else {
-			button.setText(altText);
-			System.err.println("Resource not found : "+imageLocation);
-		}
+		//button.setText(altText);
+		//	}
+		//else {
+		//	button.setText(altText);
+		//	System.err.println("Resource not found : "+imageLocation);
+		//}
 		return button;
-	}
+		}
 	public void actionPerformed(final ActionEvent event){
 		final Object src=event.getSource();
 		if(src==circle){
@@ -83,4 +84,4 @@ public class Shapes extends JPanel implements ActionListener{
 		System.out.println("draw RoundedRect");
 	}
 
-}
+	}
